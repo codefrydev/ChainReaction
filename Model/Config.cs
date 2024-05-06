@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ChainReaction.Pages
+namespace ChainReaction.Model
 {
     public class Config
     {
@@ -10,7 +10,7 @@ namespace ChainReaction.Pages
         [MinLength(2)]
         public static int NumberOfPlayer { get; set; } = 2;
 
-        public static string CurrentUserColor {  get; set; } = string.Empty;
-        public static string HoverColor {  get; set; }=string.Empty;
+        public static string CurrentUserColor { get; set; } = string.Empty;
+        public static string HoverColor { get; set; } = string.Empty;
     }
 }

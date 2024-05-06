@@ -1,4 +1,5 @@
 ﻿
+using ChainReaction.Model;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
@@ -6,20 +7,20 @@ namespace ChainReaction.Pages;
 
 public partial class Index
 {
-    List<List<Cell>> _cells;
+    List<List<Cell>> _cells=new();
     bool busy = false;
     int count = 0;
     List<Player> PlayerList = [];
-    [Inject] protected IJSRuntime JSRuntime { get; set; }
+    [Inject] protected IJSRuntime JSRuntime { get; set; } = null!;
 
     protected int DeviceWidth { get; set; }
     protected int DeviceHeight { get; set; }
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; } = null!;
     public async Task CogClicked()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         await DialogService.ShowAsync<DialogComponent>("Configuration", options);
-        await Reset();
+        Reset();
         StateHasChanged();
     }
 
@@ -100,8 +101,8 @@ public partial class Index
         await Increase(_cells[x][y], index);
         await Task.Delay(20);
         StateHasChanged();
-    } 
-    async Task Reset()
+    }
+    void Reset()
     {
         PlayerList = [
             new Player()
@@ -150,7 +151,12 @@ public partial class Index
         _cells[Config.Height - 1][Config.Width - 1].Capacity = 1;
 
     }
-
+    void Possible()
+    {
+        Config.Width = (DeviceWidth) / 64;
+        Config.Height = (DeviceHeight) / 64;
+        Reset();
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -160,6 +166,8 @@ public partial class Index
             await JSRuntime.InvokeVoidAsync("window.getDeviceHeight", DotNetObjectReference.Create(this));
         }
     }
+
+    
 
     [JSInvokable]
     public void UpdateDeviceWidth(int width)
@@ -181,7 +189,7 @@ public partial class Index
     protected override async Task OnInitializedAsync()
     {
 
-        await Reset();
+        Reset();
         await base.OnInitializedAsync();
     }
 }

@@ -38,8 +38,8 @@
 </div>
 
 @code {
-    [Parameter] public Cell cell { get; set; }
-    [Parameter] public string cellWidth { get; set; }
+    [Parameter] public Cell cell { get; set; } = new();
+    [Parameter] public string cellWidth { get; set; } = string.Empty;
 
     string GetWidth()
     {

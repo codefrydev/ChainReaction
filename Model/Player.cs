@@ -1,8 +1,8 @@
-﻿namespace ChainReaction.Pages
+﻿namespace ChainReaction.Model
 {
     public class Player
-    { 
-        public string Name { get; set; } 
+    {
+        public string Name { get; set; } =string.Empty;
         public int RColor { get; set; }
         public int GColor { get; set; }
         public int BColor { get; set; }
