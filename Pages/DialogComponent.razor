@@ -1,0 +1,22 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudSlider @bind-Value="@Config.Width" Min="5" Max="100" Color="Color.Info">
+            Width: @Config.Width
+        </MudSlider>
+        <MudSlider @bind-Value="@Config.Height" Min="5" Max="100" Color="Color.Info">
+            Heigth: @Config.Height
+        </MudSlider>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+}

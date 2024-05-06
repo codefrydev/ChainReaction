@@ -1,0 +1,42 @@
+name: deployandpublish
+
+on:
+  push:
+    branches: [ "master" ] 
+# permissions:
+#     id-token: write
+#     contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        
+    - name: Publish .NET Core Project
+      run: dotnet publish ChainReaction.csproj -c Release -o release --nologo
+    
+ 
+    - name: Change base-tag in index.html from / to ChainReaction
+      run: sed -i 's/<base href="\/" \/>/<base href="\/ChainReaction\/" \/>/g' release/wwwroot/index.html
+    
+ 
+    - name: copy index.html to 404.html
+      run: cp release/wwwroot/index.html release/wwwroot/404.html
+
+    # (Allow files and folders starting with an underscore)
+    - name: Add .nojekyll file
+      run: touch release/wwwroot/.nojekyll
+      
+    - name: Commit wwwroot to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: release/wwwroot	
