@@ -20,22 +20,24 @@
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
-    <script > 
+    <script>
         window.getDeviceWidth = function (dotnetHelper) {
             // Call the provided .NET callback with the updated width
-            dotnetHelper.invokeMethodAsync('UpdateDeviceWidth', window.innerWidth);
+            dotnetHelper.invokeMethodAsync('UpdateDeviceWidth', parseInt(window.innerHeight));
         }
         window.getDeviceHeight = function (dotnetHelper) {
-            // Call the provided .NET callback with the updated width
-            dotnetHelper.invokeMethodAsync('UpdateDeviceHeight',window.innerHeight);
+            // Call the provided .NET callback with the updated height
+            dotnetHelper.invokeMethodAsync('UpdateDeviceHeight', parseInt(window.innerHeight));
         }
 
         //window.addEventListener('resize', function () {
-        //    // Call the 'getDeviceWidth' function when window is resized
+        //    // Call the 'getDeviceWidth' and 'getDeviceHeight' functions when window is resized
         //    window.getDeviceWidth(window.DotNet);
+        //    window.getDeviceHeight(window.DotNet);
         //});
 
     </script>
+
 </body>
 
 </html>
