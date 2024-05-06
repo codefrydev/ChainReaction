@@ -1,5 +1,5 @@
 ﻿<div class="container"
-     style="background-color:transparent;@("width:{GetWidth()};height:{GetWidth()};")">
+     style="background-color:transparent;@("width:{GetWidth()};height:{GetWidth()};");border-color:@($"{Config.CurrentUserColor}") ">
     @* <div class="center-text">@cell.CurrentCount</div> *@
     <svg width="@GetWidth()" height="@GetWidth()" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
         <!-- Define the circular path -->
@@ -51,6 +51,7 @@
     .container {
         position: relative;
         border-width: 2px;
+        
     }
 
     .center-text {

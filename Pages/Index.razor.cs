@@ -17,7 +17,8 @@ public partial class Index
     }
     public async Task UserClicked(Cell cell)
     {
-        if (busy) return;
+        if (busy) return; 
+        StateHasChanged();
 
         Console.WriteLine($"{PlayerList.Count} : {count} : {PlayerList[count].Name}");
 
@@ -32,7 +33,8 @@ public partial class Index
                 count = 0;
             }
         }
-        busy=false;
+        Config.CurrentUserColor = PlayerList[count].ColorFormed();
+        busy =false;
     }
 
     
