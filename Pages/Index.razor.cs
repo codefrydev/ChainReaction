@@ -1,5 +1,6 @@
 ﻿
-using Microsoft.AspNetCore.Components; 
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
 namespace ChainReaction.Pages;
 
@@ -9,18 +10,25 @@ public partial class Index
     bool busy = false;
     int count = 0;
     List<Player> PlayerList = [];
-    protected override async Task OnInitializedAsync()
+    [Inject] protected IJSRuntime JSRuntime { get; set; }
+
+    protected int DeviceWidth { get; set; }
+    protected int DeviceHeight { get; set; }
+    [Inject] public IDialogService DialogService { get; set; }
+    public async Task CogClicked()
     {
-        
-        await Reset(); 
-        await  base.OnInitializedAsync();
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        await DialogService.ShowAsync<DialogComponent>("Configuration", options);
+        await Reset();
+        StateHasChanged();
     }
+
     public async Task UserClicked(Cell cell)
     {
         if (busy) return; 
         StateHasChanged();
 
-        Console.WriteLine($"{PlayerList.Count} : {count} : {PlayerList[count].Name}");
+        //Console.WriteLine($"{PlayerList.Count} : {count} : {PlayerList[count].Name}");
 
         if (string.IsNullOrEmpty(cell.Name) || cell.Name == PlayerList[count].Name)
         {
@@ -34,6 +42,7 @@ public partial class Index
             }
         }
         Config.CurrentUserColor = PlayerList[count].ColorFormed();
+        Config.HoverColor = PlayerList[count].HoverColorFormed();
         busy =false;
     }
 
@@ -89,19 +98,9 @@ public partial class Index
         //_cells[x][y].Name = PlayerList[index].Name;
 
         await Increase(_cells[x][y], index);
-        await Task.Delay(100);
+        await Task.Delay(20);
         StateHasChanged();
-    }
-    string color = "white";
-    void OnEnter()
-    {
-        color = PlayerList[count].ColorFormed();
-    }
-    void OnExit()
-    {
-        color = "white";
-    }
-    
+    } 
     async Task Reset()
     {
         PlayerList = [
@@ -152,4 +151,37 @@ public partial class Index
 
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Register the JavaScript function and pass the callback
+            await JSRuntime.InvokeVoidAsync("window.getDeviceWidth", DotNetObjectReference.Create(this));
+            await JSRuntime.InvokeVoidAsync("window.getDeviceHeight", DotNetObjectReference.Create(this));
+        }
+    }
+
+    [JSInvokable]
+    public void UpdateDeviceWidth(int width)
+    {
+        Console.WriteLine("Width received from JavaScript: " + width);
+        DeviceWidth = width;
+        StateHasChanged();
+    }
+    [JSInvokable]
+    public void UpdateDeviceHeight(int width)
+    {
+        DeviceHeight = width;
+        StateHasChanged();
+    }
+    string GetWidth()
+    {
+        return $"{(DeviceWidth) / (Config.Width + 2)}px";
+    }
+    protected override async Task OnInitializedAsync()
+    {
+
+        await Reset();
+        await base.OnInitializedAsync();
+    }
 }

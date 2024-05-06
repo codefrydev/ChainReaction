@@ -1,6 +1,7 @@
 ﻿<div class="container"
-     style="background-color:transparent;@("width:{GetWidth()};height:{GetWidth()};");border-color:@($"{Config.CurrentUserColor}") ">
-    @* <div class="center-text">@cell.CurrentCount</div> *@
+     style="background:@($"{color}");@("width:{GetWidth()};height:{GetWidth()};");border-color:@($"{Config.CurrentUserColor}"); cursor:pointer "
+     @onmouseenter="OnEnter" @onmouseleave="OnExit"
+> 
     <svg width="@GetWidth()" height="@GetWidth()" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
         <!-- Define the circular path -->
         <path id="circlePath" fill="none" stroke="none" d="M100,100 m-50,0 a50,50 0 1,0 100,0 a50,50 0 1,0 -100,0" />
@@ -44,7 +45,15 @@
     {
         return cellWidth;
     }
-
+    private string color = "white";
+    void OnEnter()
+    {
+        color = Config.HoverColor;
+    }
+    void OnExit()
+    {
+        color = "transparent";
+    }
 }
 
 <style>

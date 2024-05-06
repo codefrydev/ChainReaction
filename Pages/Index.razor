@@ -1,65 +1,37 @@
 ﻿@page "/"
 
 <PageTitle>Chain Reaction</PageTitle>
-<MudAvatar Color="Color.Warning" Variant="Variant.Filled" @onclick="CogClicked">
-    <MudIcon Color="Color.Dark" Icon="@Icons.Custom.Uncategorized.Radioactive" Size="Size.Large" Title="@busy.ToString()"/>
-</MudAvatar>
-<MudPaper Class="d-flex flex-column gap-1" Elevation="0">
-    @foreach (var item in _cells)
-    {
-        <MudPaper Class="d-flex flex-row flex-grow-1 gap-1" Elevation="0">
-            @foreach (var cell in item)
-            {
-                <div 
-                    @onclick="@(()=>UserClicked(cell))" 
-                    @onmouseenter="OnEnter" @onmouseleave="OnExit" >
-                    <CellComponent cell="cell" cellWidth="@GetWidth()" />
-                </div>
-            }
 
-        </MudPaper>
-    }
-</MudPaper> 
-@code
-{
-    [Inject]
-    protected IJSRuntime JSRuntime { get; set; }
+<MudContainer Class="center-container mt-3">
 
-    protected int DeviceWidth { get; set; }
-    protected int DeviceHeight { get; set; }
-    [Inject] public IDialogService DialogService { get; set; }
-    public async Task CogClicked()
-    {
-        var options = new DialogOptions { CloseOnEscapeKey = true };
-        await DialogService.ShowAsync<DialogComponent>("Configuration", options);
-        Reset();
-        StateHasChanged();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
+    <MudPaper Class="d-flex flex-column gap-1" Elevation="0">
+        @foreach (var item in _cells)
         {
-            // Register the JavaScript function and pass the callback
-            await JSRuntime.InvokeVoidAsync("window.getDeviceWidth", DotNetObjectReference.Create(this));
-            await JSRuntime.InvokeVoidAsync("window.getDeviceHeight", DotNetObjectReference.Create(this));
-        }
-    }
+            <MudPaper Class="d-flex flex-row flex-grow-1 gap-1" Elevation="0">
+                @foreach (var cell in item)
+                {
+                    <div @onclick="@(()=>UserClicked(cell))" >
+                        <CellComponent cell="cell" cellWidth="@GetWidth()" />
+                    </div>
+                }
 
-    [JSInvokable]
-    public void UpdateDeviceWidth(int width)
-    {
-        DeviceWidth = width;
-        StateHasChanged();
+            </MudPaper>
+        }
+    </MudPaper>
+
+</MudContainer>
+<div class="d-flex"
+     style="position: fixed;bottom:0; right: 0; z-index:999; background-color:rgba(191, 202, 219,0.3); border-radius:15%; margin:20px;">
+    <MudAvatar Color="Color.Warning" Variant="Variant.Filled" @onclick="CogClicked">
+        <MudIcon Color="Color.Dark" Icon="@Icons.Material.Rounded.Settings" Size="Size.Large" Title="@busy.ToString()" />
+    </MudAvatar>
+</div>
+
+
+<style>
+    .center-container {
+        display: flex;
+        justify-content: center;
+        align-items: center; 
     }
-    [JSInvokable]
-    public void UpdateDeviceHeight(int width)
-    {
-        DeviceHeight = width;
-        StateHasChanged();
-    }
-    string GetWidth()
-    {
-        return  $"{(DeviceWidth) / (Config.Width + 2)}px";
-    }
-}
+</style>
