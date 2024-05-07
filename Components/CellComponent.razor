@@ -1,5 +1,5 @@
 ﻿<div class="container"
-     style="background:@($"{color}");@("width:{Config.CellHeight};height:{Config.CellHeight};");border-color:@($"{Config.CurrentUserColor}"); cursor:pointer "
+     style="background:@($"{color}");@("width:{Config.CellHeight};height:{Config.CellHeight};");border-color:@($"{Config.HoverColor}"); cursor:pointer "
      @onmouseenter="OnEnter" @onmouseleave="OnExit">
     @if (Config.icon)
     {

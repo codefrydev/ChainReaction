@@ -94,8 +94,6 @@ public partial class Index
     }
     public async Task CallIncrease(int x, int y, int index)
     {
-        //_cells[x][y].Name = PlayerList[index].Name;
-
         await Increase(_cells[x][y], index);
         //if(!Config.icon) for future implement
             await Task.Delay(20);
@@ -125,18 +123,7 @@ public partial class Index
     }
     void Reset()
     {
-        PlayerList = [
-            new Player()
-            {
-                Name="Player One",
-                RColor=255
-            },
-            new Player()
-            {
-                Name="Player Two",
-                GColor=255
-            }
-        ];
+        PlayerList = Config.PlayerList.Take(Config.NumberOfPlayer).ToList();
         _cells = [];
 
         for (int i = 0; i < row; i++)
