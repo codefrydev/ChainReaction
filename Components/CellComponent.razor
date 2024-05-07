@@ -1,8 +1,7 @@
 ﻿<div class="container"
-     style="background:@($"{color}");@("width:{GetWidth()};height:{GetWidth()};");border-color:@($"{Config.CurrentUserColor}"); cursor:pointer "
-     @onmouseenter="OnEnter" @onmouseleave="OnExit"
-> 
-    <svg width="@GetWidth()" height="@GetWidth()" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+     style="background:@($"{color}");@("width:{Config.CellHeight};height:{Config.CellHeight};");border-color:@($"{Config.CurrentUserColor}"); cursor:pointer "
+     @onmouseenter="OnEnter" @onmouseleave="OnExit">
+    <svg width="@Config.CellHeight" height="@Config.CellHeight" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
         <!-- Define the circular path -->
         <path id="circlePath" fill="none" stroke="none" d="M100,100 m-50,0 a50,50 0 1,0 100,0 a50,50 0 1,0 -100,0" />
         <!-- First Circle -->
@@ -38,29 +37,17 @@
 </div>
 
 @code {
-    [Parameter] public Cell cell { get; set; } = new();
-    [Parameter] public string cellWidth { get; set; } = string.Empty;
-
-    string GetWidth()
-    {
-        return cellWidth;
-    }
+    [Parameter] public Cell cell { get; set; } = new(); 
+     
     private string color = "white";
-    void OnEnter()
-    {
-        color = Config.HoverColor;
-    }
-    void OnExit()
-    {
-        color = "transparent";
-    }
+    void OnEnter() => color = Config.HoverColor;
+    void OnExit() => color = "transparent";
 }
 
 <style>
     .container {
         position: relative;
         border-width: 2px;
-        
     }
 
     .center-text {

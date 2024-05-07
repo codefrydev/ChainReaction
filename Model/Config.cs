@@ -3,9 +3,8 @@
 namespace ChainReaction.Model
 {
     public class Config
-    {
-        public static int Width { get; set; } = 10;
-        public static int Height { get; set; } = 10;
+    { 
+        public static int CellHeight { get; set; } = 64;
 
         [MinLength(2)]
         public static int NumberOfPlayer { get; set; } = 2;

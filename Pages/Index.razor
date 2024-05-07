@@ -1,32 +1,36 @@
 ﻿@page "/"
 
 <PageTitle>Chain Reaction</PageTitle>
+@if(_cells is not null)
+{
+    <MudContainer Class="center-container mt-3">
 
-<MudContainer Class="center-container mt-3">
+        <MudPaper Class="d-flex flex-column gap pa-2" Elevation="1">
+            @foreach (var item in _cells)
+            {
+                <MudPaper Class="d-flex flex-row flex-grow-1 gap-0" Elevation="0">
+                    @foreach (var cell in item)
+                    {
+                        <div @onclick="@(()=>UserClicked(cell))" >
+                            <CellComponent cell="cell" />
+                        </div>
+                    }
 
-    <MudPaper Class="d-flex flex-column gap-1" Elevation="0">
-        @foreach (var item in _cells)
-        {
-            <MudPaper Class="d-flex flex-row flex-grow-1 gap-1" Elevation="0">
-                @foreach (var cell in item)
-                {
-                    <div @onclick="@(()=>UserClicked(cell))" >
-                        <CellComponent cell="cell" cellWidth="@GetWidth()" />
-                    </div>
-                }
+                </MudPaper>
+            }
+        </MudPaper>
 
-            </MudPaper>
-        }
-    </MudPaper>
+    </MudContainer>
+}
 
-</MudContainer>
+@* 
 <div class="d-flex"
      style="position: fixed;bottom:0; right: 0; z-index:999; background-color:rgba(191, 202, 219,0.3); border-radius:15%; margin:20px;">
     <MudAvatar Color="Color.Warning" Variant="Variant.Filled" @onclick="CogClicked">
         <MudIcon Color="Color.Dark" Icon="@Icons.Material.Rounded.Settings" Size="Size.Large" Title="@busy.ToString()" />
     </MudAvatar>
 </div>
-
+ *@
 
 <style>
     .center-container {

@@ -1,4 +1,5 @@
 ﻿
+using ChainReaction.Components;
 using ChainReaction.Model;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -7,26 +8,37 @@ namespace ChainReaction.Pages;
 
 public partial class Index
 {
-    List<List<Cell>> _cells=new();
-    bool busy = false;
-    int count = 0;
+    List<List<Cell>> _cells = [];
     List<Player> PlayerList = [];
     [Inject] protected IJSRuntime JSRuntime { get; set; } = null!;
-
-    protected int DeviceWidth { get; set; }
-    protected int DeviceHeight { get; set; }
     [Inject] public IDialogService DialogService { get; set; } = null!;
-    public async Task CogClicked()
+    bool busy = false;
+
+    int count = 0;
+    int column = 0;
+    int row = 0;
+    WindowSize? windowSize;
+    int cellSize = 64;
+    public int CellSize
+    {
+        get { return cellSize; }
+        set
+        {
+            cellSize = value;
+            Resize();
+        }
+    }
+    public void CogClicked()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
-        await DialogService.ShowAsync<DialogComponent>("Configuration", options);
-        Reset();
+        DialogService.ShowAsync<DialogComponent>("Configuration", options);
+        Resize();
         StateHasChanged();
     }
 
     public async Task UserClicked(Cell cell)
     {
-        if (busy) return; 
+        if (busy) return;
         StateHasChanged();
 
         //Console.WriteLine($"{PlayerList.Count} : {count} : {PlayerList[count].Name}");
@@ -44,10 +56,10 @@ public partial class Index
         }
         Config.CurrentUserColor = PlayerList[count].ColorFormed();
         Config.HoverColor = PlayerList[count].HoverColorFormed();
-        busy =false;
+        busy = false;
     }
 
-    
+
     public async Task Increase(Cell cell, int index)
     {
 
@@ -59,37 +71,23 @@ public partial class Index
         {
             cell.CurrentCount = 0;
             cell.Name = string.Empty;
-            #region neighbour
-            int x = cell.X;
-            int y = cell.Y;
-            // up
-            int upX = x;
-            int upY = y - 1;
-            if (upY >= 0)
+            #region neighbour 
+
+            var ls = new List<(int, int)>
             {
-                await CallIncrease(upX, upY, index);
-            }
-            // down
-            int downX = x;
-            int downY = y + 1;
-            if (downY < Config.Width)
+                (cell.X,     cell.Y - 1),
+                (cell.X,     cell.Y + 1),
+                (cell.X - 1, cell.Y ),
+                (cell.X + 1, cell.Y )
+            };
+
+            foreach (var (x, y) in ls)
             {
-                await CallIncrease(downX, downY, index);
-            }
-            // left
-            int leftX = x - 1;
-            int leftY = y;
-            if (leftX >= 0)
-            {
-                await CallIncrease(leftX, leftY, index);
-            }
-            // right
-            int rightX = x + 1;
-            int rightY = y;
-            if (rightX < Config.Height)
-            {
-                await CallIncrease(rightX, rightY, index);
-            }
+                if(x>=0 && y>=0 && y<column && x<row)
+                {
+                    await CallIncrease(x, y, index);
+                }
+            } 
             #endregion
 
         }
@@ -100,6 +98,28 @@ public partial class Index
 
         await Increase(_cells[x][y], index);
         await Task.Delay(20);
+        StateHasChanged();
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await GetInnerDimensions();
+        }
+    }
+
+    private async Task GetInnerDimensions()
+    {
+        windowSize = await JSRuntime.InvokeAsync<WindowSize>("getInnerDimensions");
+        Resize();
+    }
+
+    void Resize()
+    {
+        int extra = windowSize?.Width > 1600 ? 3 : 0;
+        column = (windowSize?.Width / cellSize) -extra ?? 10;
+        row = (windowSize?.Height / cellSize) - 2 ?? 10;
+        Reset();
         StateHasChanged();
     }
     void Reset()
@@ -118,10 +138,10 @@ public partial class Index
         ];
         _cells = [];
 
-        for (int i = 0; i < Config.Height; i++)
+        for (int i = 0; i < row; i++)
         {
             var ls = new List<Cell>();
-            for (int j = 0; j < Config.Width; j++)
+            for (int j = 0; j < column; j++)
             {
                 ls.Add(new Cell()
                 {
@@ -135,61 +155,19 @@ public partial class Index
         }
 
         // setting capacity for edge cases
-        for (int i = 0; i < Config.Height; i++)
+        for (int i = 0; i < row; i++)
         {
             _cells[i][0].Capacity = 2;
-            _cells[i][Config.Width - 1].Capacity = 2;
+            _cells[i][column - 1].Capacity = 2;
         }
-        for (int i = 0; i < Config.Width; i++)
+        for (int i = 0; i < column; i++)
         {
             _cells[0][i].Capacity = 2;
-            _cells[Config.Height - 1][i].Capacity = 2;
+            _cells[row - 1][i].Capacity = 2;
         }
         _cells[0][0].Capacity = 1;
-        _cells[0][Config.Width - 1].Capacity = 1;
-        _cells[Config.Height - 1][0].Capacity = 1;
-        _cells[Config.Height - 1][Config.Width - 1].Capacity = 1;
-
-    }
-    void Possible()
-    {
-        Config.Width = (DeviceWidth) / 64;
-        Config.Height = (DeviceHeight) / 64;
-        Reset();
-    }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            // Register the JavaScript function and pass the callback
-            await JSRuntime.InvokeVoidAsync("window.getDeviceWidth", DotNetObjectReference.Create(this));
-            await JSRuntime.InvokeVoidAsync("window.getDeviceHeight", DotNetObjectReference.Create(this));
-        }
-    }
-
-    
-
-    [JSInvokable]
-    public void UpdateDeviceWidth(int width)
-    {
-        Console.WriteLine("Width received from JavaScript: " + width);
-        DeviceWidth = width;
-        StateHasChanged();
-    }
-    [JSInvokable]
-    public void UpdateDeviceHeight(int width)
-    {
-        DeviceHeight = width;
-        StateHasChanged();
-    }
-    string GetWidth()
-    {
-        return $"{(DeviceWidth) / (Config.Width + 2)}px";
-    }
-    protected override async Task OnInitializedAsync()
-    {
-
-        Reset();
-        await base.OnInitializedAsync();
+        _cells[0][column - 1].Capacity = 1;
+        _cells[row - 1][0].Capacity = 1;
+        _cells[row - 1][column - 1].Capacity = 1;
     }
 }

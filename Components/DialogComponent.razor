@@ -1,12 +1,8 @@
 ﻿<MudDialog>
-    <DialogContent>
-        <MudSlider @bind-Value="@Config.Width" Min="5" Max="100" Color="Color.Info">
-            Width: @Config.Width
+    <DialogContent> 
+        <MudSlider @bind-Value="@Config.CellHeight" Min="32" Max="256" Color="Color.Info">
+            Heigth: @Config.CellHeight
         </MudSlider>
-        <MudSlider @bind-Value="@Config.Height" Min="5" Max="100" Color="Color.Info">
-            Heigth: @Config.Height
-        </MudSlider>
-
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
