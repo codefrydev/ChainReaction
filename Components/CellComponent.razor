@@ -1,44 +1,67 @@
 ﻿<div class="container"
      style="background:@($"{color}");@("width:{Config.CellHeight};height:{Config.CellHeight};");border-color:@($"{Config.CurrentUserColor}"); cursor:pointer "
      @onmouseenter="OnEnter" @onmouseleave="OnExit">
-    <svg width="@Config.CellHeight" height="@Config.CellHeight" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <!-- Define the circular path -->
-        <path id="circlePath" fill="none" stroke="none" d="M100,100 m-50,0 a50,50 0 1,0 100,0 a50,50 0 1,0 -100,0" />
-        <!-- First Circle -->
-        @if (cell.CurrentCount > 0)
-        {
-            <!-- First circle that will move along the path -->
-            <circle cx="0" cy="0" r="20" fill="@($"{cell.Color}")">
-                <animateMotion dur=".72s" repeatCount="indefinite">
-                    <mpath xlink:href="#circlePath" />
-                </animateMotion>
-            </circle>
-        }
+    @if (Config.icon)
+    {
+        <svg width="@Config.CellHeight" height="@Config.CellHeight" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"> 
+            @if (cell.CurrentCount == 1)
+            { 
+                <circle cx="100" cy="100" r="30" fill="@($"{cell.Color}")"></circle>
+            }
+            else if (cell.CurrentCount == 2)
+            {
+                <circle cx="50" cy="100" r="30" fill="@($"{cell.Color}")"></circle>
+                <circle cx="150" cy="100" r="30" fill="@($"{cell.Color}")"></circle>
+            } 
+            else if (cell.CurrentCount == 3)
+            {
+                <circle cx="100" cy="70" r="30" fill="@($"{cell.Color}")"></circle>
+                <circle cx="50" cy="140" r="30" fill="@($"{cell.Color}")"></circle>
+                <circle cx="150" cy="140" r="30" fill="@($"{cell.Color}")"></circle>
+            }
+        </svg>
+    }
+    else
+    {
 
-        <!-- Second Circle -->
-        @if (cell.CurrentCount > 1)
-        {
-            <circle cx="0" cy="0" r="20" fill="@($"{cell.Color}")">
-                <animateMotion dur=".72s" repeatCount="indefinite" begin="-0.24s">
-                    <mpath xlink:href="#circlePath" />
-                </animateMotion>
-            </circle>
-        }
-        <!-- Third Circle -->
-        @if (cell.CurrentCount > 2)
-        {
-            <circle cx="0" cy="0" r="20" fill="@($"{cell.Color}")">
-                <animateMotion dur=".72s" repeatCount="indefinite" begin="-0.48s">
-                    <mpath xlink:href="#circlePath" />
-                </animateMotion>
-            </circle>
-        }
-    </svg>
+        <svg width="@Config.CellHeight" height="@Config.CellHeight" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <!-- Define the circular path -->
+            <path id="circlePath" fill="none" stroke="none" d="M100,100 m-50,0 a50,50 0 1,0 100,0 a50,50 0 1,0 -100,0" />
+            <!-- First Circle -->
+            @if (cell.CurrentCount > 0)
+            {
+                <!-- First circle that will move along the path -->
+                <circle cx="0" cy="0" r="20" fill="@($"{cell.Color}")">
+                    <animateMotion dur=".72s" repeatCount="indefinite">
+                        <mpath xlink:href="#circlePath" />
+                    </animateMotion>
+                </circle>
+            }
+
+            <!-- Second Circle -->
+            @if (cell.CurrentCount > 1)
+            {
+                <circle cx="0" cy="0" r="20" fill="@($"{cell.Color}")">
+                    <animateMotion dur=".72s" repeatCount="indefinite" begin="-0.24s">
+                        <mpath xlink:href="#circlePath" />
+                    </animateMotion>
+                </circle>
+            }
+            <!-- Third Circle -->
+            @if (cell.CurrentCount > 2)
+            {
+                <circle cx="0" cy="0" r="20" fill="@($"{cell.Color}")">
+                    <animateMotion dur=".72s" repeatCount="indefinite" begin="-0.48s">
+                        <mpath xlink:href="#circlePath" />
+                    </animateMotion>
+                </circle>
+            }
+        </svg>
+    }
 </div>
 
 @code {
-    [Parameter] public Cell cell { get; set; } = new(); 
-     
+    [Parameter] public Cell cell { get; set; } = new();
     private string color = "white";
     void OnEnter() => color = Config.HoverColor;
     void OnExit() => color = "transparent";

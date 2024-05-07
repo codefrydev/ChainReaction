@@ -3,7 +3,8 @@
 namespace ChainReaction.Model
 {
     public class Config
-    { 
+    {
+        public static bool icon = true;
         public static int CellHeight { get; set; } = 64;
 
         [MinLength(2)]

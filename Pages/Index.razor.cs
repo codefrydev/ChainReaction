@@ -97,7 +97,8 @@ public partial class Index
         //_cells[x][y].Name = PlayerList[index].Name;
 
         await Increase(_cells[x][y], index);
-        await Task.Delay(20);
+        //if(!Config.icon) for future implement
+            await Task.Delay(20);
         StateHasChanged();
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
