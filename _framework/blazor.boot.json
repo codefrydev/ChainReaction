@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "ChainReaction",
   "resources": {
-    "hash": "sha256-FNPZshNb0iCAdhOeX1Nn7f3U8RQpmjqwKiAj6P77K8E=",
+    "hash": "sha256-AUqSgEbEBIYuleCR7A27vADBcUO+r4SI9QydNN9qy4s=",
     "jsModuleNative": {
       "dotnet.native.8.0.4.6vlmefabfv.js": "sha256-ju0+XWE0ihz554eKEj0HQ8Opa61xpbUIaX5/MNo8we4="
     },
@@ -17,7 +17,7 @@
       "icudt_no_CJK.dat": "sha256-L7sV7NEYP37/Qr2FPCePo5cJqRgTXRwGHuwF5Q+0Nfs="
     },
     "assembly": {
-      "ChainReaction.wasm": "sha256-4xz1ol+0LpIEYyeR3N9IvIMpZeSgde6j94BAwc4hLNc=",
+      "ChainReaction.wasm": "sha256-2nX8DV1EUwvkzzYr/qhd3ntRWcZOtQaizpTYbVh7/O4=",
       "Microsoft.AspNetCore.Components.Forms.wasm": "sha256-mD/Kkid5kAbCd8FTvX7nRa1Zrwyztxc16j0tUjgwvKc=",
       "Microsoft.AspNetCore.Components.wasm": "sha256-wxNLNmmS2ANAB8x+CRQJvgZ0LaaKZAm41AnNWkqww14=",
       "Microsoft.AspNetCore.Components.Web.wasm": "sha256-UT2Sj9jRgg6dNI+TkvB5fcy6N7CMEEdxVRuLGlnTRvU=",
