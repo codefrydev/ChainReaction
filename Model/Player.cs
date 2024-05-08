@@ -2,7 +2,8 @@
 {
     public class Player
     {
-        public string Name { get; set; } =string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public bool IsOut { get; set; } = false;
         public int RColor { get; set; }
         public int GColor { get; set; }
         public int BColor { get; set; }

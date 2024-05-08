@@ -18,42 +18,42 @@ namespace ChainReaction.Model
             new Player()
             {
                 Name="Player One",
-                RColor=61,
-                BColor=52,
-                GColor=139 
+                RColor=255,
+                BColor=0,
+                GColor=0
             },
             new Player()
             {
                 Name="Player Two",
-                RColor=247,
-                BColor=184,
-                GColor=1
+                RColor=0,
+                BColor=0,
+                GColor=255
             },new Player()
             {
                 Name="Player Three",
-                RColor=243,
-                BColor=91,
-                GColor=4
-            },
-            new Player()
-            {
-                Name="Player Four",
-                RColor=49,
-                BColor=57,
-                GColor=60
-            },new Player()
-            {
-                Name="Player Five",
-                RColor=13,
-                BColor=118,
+                RColor=255,
+                BColor=0,
                 GColor=255
             },
             new Player()
             {
+                Name="Player Four",
+                RColor=0,
+                BColor=255,
+                GColor=0
+            },new Player()
+            {
+                Name="Player Five",
+                RColor=0,
+                BColor=0,
+                GColor=0
+            },
+            new Player()
+            {
                 Name="Player Six",
-                RColor=143,
-                BColor=45,
-                GColor=86
+                RColor=0,
+                BColor=255,
+                GColor=255
             }
         ];
     }

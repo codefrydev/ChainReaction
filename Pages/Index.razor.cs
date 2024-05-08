@@ -19,6 +19,12 @@ public partial class Index
     int row = 0;
     WindowSize? windowSize;
     int cellSize = 64;
+    bool allPlayerPlayed = false;
+    bool scoreShown = false;
+    readonly HashSet<string> playerName = [];
+    readonly Dictionary<string, int> playerScore = [];
+
+    readonly bool idiotScoreLogic = false; // make this true for working on score system
     public int CellSize
     {
         get { return cellSize; }
@@ -38,15 +44,23 @@ public partial class Index
 
     public async Task UserClicked(Cell cell)
     {
+
         if (busy) return;
-        StateHasChanged();
-
-        //Console.WriteLine($"{PlayerList.Count} : {count} : {PlayerList[count].Name}");
-
         if (string.IsNullOrEmpty(cell.Name) || cell.Name == PlayerList[count].Name)
         {
             busy = true;
+
+            if (idiotScoreLogic)
+            {
+                ScoreLogicOne();
+            }
+            cell.Name = PlayerList[count].Name;
             await Increase(cell, count);
+
+            if (idiotScoreLogic)
+            {
+                count -= ScoreLogicTwo();
+            }
 
             count++;
             if (count >= PlayerList.Count)
@@ -59,11 +73,91 @@ public partial class Index
         busy = false;
     }
 
+    #region Score Logic not working Properly Screwing Everything
+    void ScoreLogicOne()
+    {
+        if (!allPlayerPlayed)
+        {
+            playerScore.Add(PlayerList[count].Name, 0);
+            allPlayerPlayed = (playerScore.Count == PlayerList.Count);
+        }
+    }
+    int ScoreLogicTwo()
+    {
+        int playerRemoved = 0;
+        if (allPlayerPlayed)
+        {
+            foreach (var i in playerScore)
+            {
+                if (i.Value < 0)
+                {
+                    for (var j = 0; j < PlayerList.Count; j++)
+                    {
+                        if (i.Key == PlayerList[j].Name && j <= count)
+                        {
+                            playerRemoved++;
+                        }
+                    }
+                    playerScore.Remove(i.Key);
 
+                }
+            }
+            if (playerScore.Count == 1)
+            {
+                ShowLeaderBoard();
+            }
+        }
+        return playerRemoved;
+    }
+    void ScoreLogicThree(Cell cell)
+    {
+        if (allPlayerPlayed && PlayerList.Count == 1)
+        {
+            if (!scoreShown)
+            {
+                ShowLeaderBoard();
+                scoreShown = true;
+            }
+            return;
+        }
+
+        playerScore[PlayerList[count].Name]++;
+        Console.WriteLine($"{cell.Name}: {playerScore[PlayerList[count].Name]}");
+        if (cell.CurrentCount > cell.Capacity && playerScore.ContainsKey(cell.Name))
+        {
+            playerScore[cell.Name]--;
+            Console.WriteLine($"{cell.Name}: {playerScore[cell.Name]}");
+            if (playerScore[cell.Name] == 0)
+            {
+                playerName.Add(cell.Name);
+            }
+        }
+    }
+    void ShowLeaderBoard()
+    {
+        playerName.Add(PlayerList[0].Name);
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            DisableBackdropClick = true,
+            FullWidth = true,
+            NoHeader = true
+        };
+        var parameters = new DialogParameters<GameOver>
+        {
+            { x => x.ScoreLeaderBard, playerName.ToList() }
+        };
+        _ = DialogService.ShowAsync<GameOver>("Configuration", parameters, options);
+    }
+    #endregion
     public async Task Increase(Cell cell, int index)
     {
-
         cell.CurrentCount++;
+        if (idiotScoreLogic)
+        {
+            ScoreLogicThree(cell);
+        }
+
         cell.Name = PlayerList[index].Name;
         cell.Color = PlayerList[index].ColorFormed();
 
@@ -87,7 +181,7 @@ public partial class Index
                 {
                     await CallIncrease(x, y, index);
                 }
-            } 
+            }
             #endregion
 
         }
@@ -96,7 +190,7 @@ public partial class Index
     {
         await Increase(_cells[x][y], index);
         //if(!Config.icon) for future implement
-            await Task.Delay(20);
+        await Task.Delay(20);
         StateHasChanged();
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
