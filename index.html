@@ -2,10 +2,39 @@
 <html>
 
 <head>
+    <!-- Google Tag Manager -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VM01Q3R43D"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-VM01Q3R43D');
+    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>ChainReaction</title>
     <base href="/ChainReaction/" />
+    <style>
+        .loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .loadinBaba { 
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #e5e9f4
+        }
+    </style>
     <link href="https://pro.fontawesome.com/releases/v6.0.0-beta1/css/all.css" rel="stylesheet" crossorigin="anonymous"
           referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
@@ -13,7 +42,15 @@
 </head>
 
 <body style="background-color:#e5e9f4">
-    <div id="app">Loading...</div>
+    <div id="app">
+        <div class="loading">
+            <div class="loadinBaba">
+                <img  src="loading.svg"  height="200" width="200"/>
+                <br />
+                <h4>Chaining...</h4>
+            </div>
+        </div>
+    </div>
 
     <div id="blazor-error-ui">
         Catch Developer And Give Then High Five on their Face
@@ -22,7 +59,8 @@
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
-    <script src="dimendion.js"></script>  
+    <script src="dimendion.js"></script>
+    <script src="feedback.js"></script>
 </body>
 
 </html>
