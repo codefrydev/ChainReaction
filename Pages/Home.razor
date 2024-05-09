@@ -45,26 +45,7 @@
     </div>
 </div>
 
-
-@code {
-    [Inject]
-    public NavigationManager Manager { get; set; } = null!;
-    private int selectedNumberOfpeople = 2;
-
-    public int MyProperty
-    {
-        get { return selectedNumberOfpeople; }
-        set
-        {
-            selectedNumberOfpeople = value;
-            Config.NumberOfPlayer = selectedNumberOfpeople;
-        }
-    }
-    void StartGame()
-    {
-        Manager.NavigateTo("Game");
-    }
-}
+ 
 <style>
     .container {
         /* This ensures the container takes up the entire viewport */

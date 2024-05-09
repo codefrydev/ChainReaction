@@ -1,12 +1,12 @@
 ﻿@page "/Game"
 
 <PageTitle>Chain Reaction</PageTitle>
-@if(_cells is not null)
+@if(gridOfCells is not null)
 {
-    <MudContainer Class="center-container mt-3">
+    <MudContainer Class="center-container">
 
         <MudPaper Class="d-flex flex-column gap pa-2" Elevation="1">
-            @foreach (var item in _cells)
+            @foreach (var item in gridOfCells)
             {
                 <MudPaper Class="d-flex flex-row flex-grow-1 gap-0" Elevation="0">
                     @foreach (var cell in item)
@@ -23,45 +23,13 @@
     </MudContainer>
 }
 
-@* 
-<div class="d-flex"
-     style="position: fixed;bottom:0; right: 0; z-index:999; background-color:rgba(191, 202, 219,0.3); border-radius:15%; margin:20px;">
-    <MudAvatar Color="Color.Warning" Variant="Variant.Filled" @onclick="CogClicked">
-        <MudIcon Color="Color.Dark" Icon="@Icons.Material.Rounded.Settings" Size="Size.Large" Title="@busy.ToString()" />
-    </MudAvatar>
-</div>
- *@
-
-<div class="d-flex"
-     style="position: fixed;top:0; left: 0; z-index:999; background-color:transparent; border-radius:15%; margin:10px;">
-    <MudToggleIconButton @bind-Toggled="@Toggleme"
-                         Icon="@Icons.Custom.Uncategorized.Radioactive"
-                         Color="@Color.Error" 
-        Title="Gpu Mode Hypnotise"
-                         ToggledIcon="@Icons.Custom.Uncategorized.AlertSuccess"
-                         ToggledColor="@Color.Success"
-        ToggledTitle="Normal Mode" />
-</div>
-@code{
-    private bool GraphicImage = true;
-
-    public bool Toggleme
-    {
-        get { return GraphicImage; }
-        set 
-        { 
-            GraphicImage = value;
-            Config.icon = value;
-            StateHasChanged();
-        }
-    }
-    
-}
+<ToggleGraphicsComponent/>
 
 <style>
     .center-container {
         display: flex;
         justify-content: center;
         align-items: center; 
+        height:100vh;
     }
 </style>

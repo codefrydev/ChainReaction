@@ -1,7 +1,7 @@
 ﻿<div class="container"
-     style="background:@($"{color}");@("width:{Config.CellHeight};height:{Config.CellHeight};");border-color:@($"{Config.HoverColor}"); cursor:pointer "
+     style="background:@($"{color}");@("width:{Config.CellHeight};height:{Config.CellHeight};");border-color:@($"{Config.CurrentUserColor}"); cursor:pointer "
      @onmouseenter="OnEnter" @onmouseleave="OnExit">
-    @if (Config.icon)
+    @if (Config.Icon)
     {
         <svg width="@Config.CellHeight" height="@Config.CellHeight" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"> 
             @if (cell.CurrentCount == 1)
@@ -70,7 +70,7 @@
 <style>
     .container {
         position: relative;
-        border-width: 2px;
+        border-width: 1px;
     }
 
     .center-text {

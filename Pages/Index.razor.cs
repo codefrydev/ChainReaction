@@ -8,158 +8,122 @@ namespace ChainReaction.Pages;
 
 public partial class Index
 {
-    List<List<Cell>> _cells = [];
-    List<Player> PlayerList = [];
     [Inject] protected IJSRuntime JSRuntime { get; set; } = null!;
     [Inject] public IDialogService DialogService { get; set; } = null!;
-    bool busy = false;
 
+    bool busy = false;
     int count = 0;
     int column = 0;
     int row = 0;
     WindowSize? windowSize;
-    int cellSize = 64;
+    readonly int gridDimentions = 64;
+    List<List<Cell>> gridOfCells = [];
+    List<Player> livePlayerList = [];
+    // Scoring handeling
+    int lostPeriodForPlayerIndexingInLeaderboard = 0;
     bool allPlayerPlayed = false;
-    bool scoreShown = false;
-    readonly HashSet<string> playerName = [];
-    readonly Dictionary<string, int> playerScore = [];
-
-    readonly bool idiotScoreLogic = false; // make this true for working on score system
-    public int CellSize
-    {
-        get { return cellSize; }
-        set
-        {
-            cellSize = value;
-            Resize();
-        }
-    }
-    public void CogClicked()
-    {
-        var options = new DialogOptions { CloseOnEscapeKey = true };
-        DialogService.ShowAsync<DialogComponent>("Configuration", options);
-        Resize();
-        StateHasChanged();
-    }
-
+    readonly HashSet<string> allPlayerPlayedList = [];
+    readonly Dictionary<string, (DateTime Date, string color, int Period)> lostPlayers = [];
     public async Task UserClicked(Cell cell)
     {
 
         if (busy) return;
-        if (string.IsNullOrEmpty(cell.Name) || cell.Name == PlayerList[count].Name)
+        if (string.IsNullOrEmpty(cell.Name) || cell.Name == livePlayerList[count].Name)
         {
             busy = true;
-
-            if (idiotScoreLogic)
+            AllPlayerValidation();
+            await Increase(cell);
+            if (allPlayerPlayed)
             {
-                ScoreLogicOne();
+                CalculateScore();
+                if (livePlayerList.Count == 1)
+                {
+                    ShowLeaderBoard();
+                }
             }
-            cell.Name = PlayerList[count].Name;
-            await Increase(cell, count);
-
-            if (idiotScoreLogic)
-            {
-                count -= ScoreLogicTwo();
-            }
-
             count++;
-            if (count >= PlayerList.Count)
-            {
-                count = 0;
-            }
+            count %= livePlayerList.Count;
         }
-        Config.CurrentUserColor = PlayerList[count].ColorFormed();
-        Config.HoverColor = PlayerList[count].HoverColorFormed();
+        Config.CurrentUserColor = livePlayerList[count].ColorFormed();
+        Config.HoverColor = livePlayerList[count].HoverColorFormed();
         busy = false;
     }
-
-    #region Score Logic not working Properly Screwing Everything
-    void ScoreLogicOne()
+    #region Score Logic
+    void AllPlayerValidation()
     {
         if (!allPlayerPlayed)
         {
-            playerScore.Add(PlayerList[count].Name, 0);
-            allPlayerPlayed = (playerScore.Count == PlayerList.Count);
+            allPlayerPlayedList.Add(livePlayerList[count].Name);
+            allPlayerPlayed = (allPlayerPlayedList.Count == livePlayerList.Count);
         }
     }
-    int ScoreLogicTwo()
-    {
-        int playerRemoved = 0;
-        if (allPlayerPlayed)
-        {
-            foreach (var i in playerScore)
-            {
-                if (i.Value < 0)
-                {
-                    for (var j = 0; j < PlayerList.Count; j++)
-                    {
-                        if (i.Key == PlayerList[j].Name && j <= count)
-                        {
-                            playerRemoved++;
-                        }
-                    }
-                    playerScore.Remove(i.Key);
 
+    void CalculateScore()
+    {
+        lostPeriodForPlayerIndexingInLeaderboard++;
+        var currentPlayer = livePlayerList[count];
+        var alivePlayer = new HashSet<string>();
+        for (var i = 0; i < gridOfCells.Count; i++)
+        {
+            for (int j = 0; j < gridOfCells[0].Count; j++)
+            {
+                var cell = gridOfCells[i][j];
+                if (cell.CurrentCount > 0)
+                {
+                    alivePlayer.Add(cell.Name);
                 }
             }
-            if (playerScore.Count == 1)
-            {
-                ShowLeaderBoard();
-            }
         }
-        return playerRemoved;
-    }
-    void ScoreLogicThree(Cell cell)
-    {
-        if (allPlayerPlayed && PlayerList.Count == 1)
+        var finalPlayerLeft = new List<Player>();
+        int pos = 0;
+        int index = 0;
+        foreach (var item in livePlayerList)
         {
-            if (!scoreShown)
+            if (alivePlayer.Contains(item.Name))
             {
-                ShowLeaderBoard();
-                scoreShown = true;
+                finalPlayerLeft.Add(item);
+                if (currentPlayer == item)
+                {
+                    pos = index;
+                }
+                index++;
             }
-            return;
-        }
-
-        playerScore[PlayerList[count].Name]++;
-        Console.WriteLine($"{cell.Name}: {playerScore[PlayerList[count].Name]}");
-        if (cell.CurrentCount > cell.Capacity && playerScore.ContainsKey(cell.Name))
-        {
-            playerScore[cell.Name]--;
-            Console.WriteLine($"{cell.Name}: {playerScore[cell.Name]}");
-            if (playerScore[cell.Name] == 0)
+            else
             {
-                playerName.Add(cell.Name);
+                lostPlayers.TryAdd(item.Name, (DateTime.Now, item.HoverColorFormed(), lostPeriodForPlayerIndexingInLeaderboard));
             }
         }
+        livePlayerList = finalPlayerLeft;
+        count = pos;
     }
     void ShowLeaderBoard()
     {
-        playerName.Add(PlayerList[0].Name);
+        lostPeriodForPlayerIndexingInLeaderboard++;
+        lostPlayers.TryAdd(livePlayerList[0].Name,
+            (DateTime.Now, livePlayerList[0].HoverColorFormed(), lostPeriodForPlayerIndexingInLeaderboard));
+        var list = lostPlayers.OrderBy(x => x.Value).Select(x => x.Key).ToList();
         var options = new DialogOptions
         {
             CloseOnEscapeKey = true,
             DisableBackdropClick = true,
             FullWidth = true,
-            NoHeader = true
+            NoHeader = true,
+            FullScreen = true,
         };
         var parameters = new DialogParameters<GameOver>
         {
-            { x => x.ScoreLeaderBard, playerName.ToList() }
+            {
+                x=>x.ScoreLeaderWithTime,lostPlayers
+            }
         };
         _ = DialogService.ShowAsync<GameOver>("Configuration", parameters, options);
     }
     #endregion
-    public async Task Increase(Cell cell, int index)
+    public async Task Increase(Cell cell)
     {
         cell.CurrentCount++;
-        if (idiotScoreLogic)
-        {
-            ScoreLogicThree(cell);
-        }
-
-        cell.Name = PlayerList[index].Name;
-        cell.Color = PlayerList[index].ColorFormed();
+        cell.Name = livePlayerList[count].Name;
+        cell.Color = livePlayerList[count].ColorFormed();
 
         if (cell.CurrentCount > cell.Capacity)
         {
@@ -177,22 +141,18 @@ public partial class Index
 
             foreach (var (x, y) in ls)
             {
-                if(x>=0 && y>=0 && y<column && x<row)
+                if (x >= 0 && y >= 0 && y < column && x < row)
                 {
-                    await CallIncrease(x, y, index);
+                    await Increase(gridOfCells[x][y]);
+                    await Task.Delay(Config.DelayTimeInMilliSecond);
+                    StateHasChanged();
                 }
             }
             #endregion
-
         }
     }
-    public async Task CallIncrease(int x, int y, int index)
-    {
-        await Increase(_cells[x][y], index);
-        //if(!Config.icon) for future implement
-        await Task.Delay(20);
-        StateHasChanged();
-    }
+
+    #region Setting Up Enviroment
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -209,16 +169,16 @@ public partial class Index
 
     void Resize()
     {
-        int extra = windowSize?.Width > 1600 ? 3 : 0;
-        column = (windowSize?.Width / cellSize) -extra ?? 10;
-        row = (windowSize?.Height / cellSize) - 2 ?? 10;
+        int extra = windowSize?.Width > 1400 ? 3 : 0;
+        column = (windowSize?.Width / gridDimentions) - extra ?? 10;
+        row = (windowSize?.Height / gridDimentions) - 2 ?? 10;
         Reset();
         StateHasChanged();
     }
     void Reset()
     {
-        PlayerList = Config.PlayerList.Take(Config.NumberOfPlayer).ToList();
-        _cells = [];
+        livePlayerList = Config.PlayerList.Take(Config.NumberOfPlayer).ToList();
+        gridOfCells = [];
 
         for (int i = 0; i < row; i++)
         {
@@ -229,27 +189,81 @@ public partial class Index
                 {
                     X = i,
                     Y = j,
-                    Capacity = 3,
+                    Capacity = Config.CellCapacity,
                     CurrentCount = 0
                 });
             }
-            _cells.Add(ls);
+            gridOfCells.Add(ls);
         }
 
         // setting capacity for edge cases
         for (int i = 0; i < row; i++)
         {
-            _cells[i][0].Capacity = 2;
-            _cells[i][column - 1].Capacity = 2;
+            gridOfCells[i][0].Capacity = 2;
+            gridOfCells[i][column - 1].Capacity = 2;
         }
         for (int i = 0; i < column; i++)
         {
-            _cells[0][i].Capacity = 2;
-            _cells[row - 1][i].Capacity = 2;
+            gridOfCells[0][i].Capacity = 2;
+            gridOfCells[row - 1][i].Capacity = 2;
         }
-        _cells[0][0].Capacity = 1;
-        _cells[0][column - 1].Capacity = 1;
-        _cells[row - 1][0].Capacity = 1;
-        _cells[row - 1][column - 1].Capacity = 1;
+        gridOfCells[0][0].Capacity = 1;
+        gridOfCells[0][column - 1].Capacity = 1;
+        gridOfCells[row - 1][0].Capacity = 1;
+        gridOfCells[row - 1][column - 1].Capacity = 1;
+    }
+
+    #endregion
+
+    // As of Now Ditching recursive call because of bug
+    // In Future may be i will look into this 
+    public async Task IncreaseNonRecursive(Cell cell)
+    {
+        var name = livePlayerList[count].Name;
+        var color = livePlayerList[count].ColorFormed();
+        cell.CurrentCount++;
+        cell.Name = name;
+        cell.Color = color;
+
+        var queue = new Queue<Cell>();
+        queue.Enqueue(cell);
+        var ls = new List<(int X, int Y)>
+        {
+            ( 0,-1),
+            ( 0, 1),
+            (-1, 0),
+            ( 1, 0)
+        };
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+
+            if (current.CurrentCount > current.Capacity)
+            {
+                current.CurrentCount = 0;
+                current.Name = string.Empty;
+                current.Color = "white";
+                foreach (var (X, Y) in ls)
+                {
+                    var x = current.X + X;
+                    var y = current.Y + Y;
+
+                    if (x >= 0 && y >= 0 && y < column && x < row)
+                    {
+                        var neighbourCell = gridOfCells[x][y];
+                        neighbourCell.CurrentCount++;
+                        neighbourCell.Name = name;
+                        neighbourCell.Color = color;
+                        // Later Neighbour may have more than 3 elements
+                        Console.WriteLine($"{neighbourCell.CurrentCount}");
+                        queue.Enqueue(neighbourCell);
+                    }
+                }
+            }
+            await Task.Delay(20);
+            StateHasChanged();
+        }
+        StateHasChanged();
     }
 }

@@ -1,0 +1,24 @@
+﻿<div class="d-flex"
+     style="position: fixed;top:0; left: 0; z-index:999; background-color:transparent; border-radius:15%; margin:5px;">
+    <MudToggleIconButton @bind-Toggled="@Toggleme"
+                         Icon="@Icons.Custom.Uncategorized.Radioactive"
+                         Color="@Color.Error"
+                         Title="Gpu Mode Hypnotise"
+                         ToggledIcon="@Icons.Custom.Uncategorized.AlertSuccess"
+                         ToggledColor="@Color.Success"
+                         ToggledTitle="Normal Mode" />
+</div>
+@code {
+    private bool GraphicImage = true;
+
+    public bool Toggleme
+    {
+        get { return GraphicImage; }
+        set
+        {
+            GraphicImage = value;
+            Config.Icon = value;
+            StateHasChanged();
+        }
+    }
+}

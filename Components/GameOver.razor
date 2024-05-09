@@ -9,12 +9,12 @@
                         <h1><i class="fas fa-crown"></i> Leader Board</h1>
                     </div>
                     <div class="body">
-                        <ol>
-                            @foreach (var player in ScoreLeaderBard.Where(x => x.Length>0).Select(x=>x).Reverse())
+                        <ol> 
+                            @foreach (var player in ScoreLeaderWithTime.OrderByDescending(x=>x.Value.Period))
                             {
-                                <li>
-                                    <mark>@player</mark>
-                                    @*  <small>948</small> *@
+                                <li style="background: @($"{player.Value.color}");">
+                                    <mark>@player.Key</mark>
+                                     <small>@player.Value.Date</small>
                                 </li>
                             }
                         </ol>
@@ -23,15 +23,15 @@
             </div>
         </MudPaper>
         <MudText Align="Align.Center">
-            <MudButton OnClick="Submit" Variant="Variant.Filled" Size="Size.Large" Color="Color.Tertiary" Class="my-8">Close Leaderboard</MudButton>
+            <MudButton OnClick="Submit" Variant="Variant.Filled" Size="Size.Large" Color="Color.Info" Class="my-4">Home</MudButton>
         </MudText>
     </DialogContent>
 </MudDialog>
 
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
-    [Parameter] public List<string> ScoreLeaderBard { get; set; } = new();
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!; 
+    [Parameter] public Dictionary<string, (DateTime Date, string color,int Period)> ScoreLeaderWithTime { get; set; } = new();
     [Inject] public NavigationManager Manager { get; set; } = null!;
 
     void Submit()
@@ -103,31 +103,8 @@
                 margin-right: 4px;
             }
 
-            .leaderboard li:nth-child(1) {
-                background: #fa6855;
-            }
-
-            .leaderboard li:nth-child(2) {
-                background: #e0574f;
-            }
-
-            .leaderboard li:nth-child(3) {
-                background: #d7514d;
-            }
-
-            .leaderboard li:nth-child(4) {
-                background: #cd4b4b;
-            }
-
-            .leaderboard li:nth-child(5) {
-                background: #c24448;
-            }
-
-            .leaderboard li:nth-child(6) {
-                background: #955d5f;
-            }
-
     .starry-background {
+        background-color:#e5e9f4;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'%3E%3Ccircle cx='100' cy='100' r='80' fill='%23FF000034' /%3E%3Ccircle cx='300' cy='800' r='100' fill='%2300FF0034' /%3E%3Ccircle cx='500' cy='100' r='120' fill='%230000FF34' /%3E%3Ccircle cx='700' cy='200' r='90' fill='%23FFFF0034' /%3E%3Ccircle cx='900' cy='400' r='110' fill='%2300FFFF' /%3E%3Ccircle cx='1100' cy='500' r='80' fill='%23FF00FF34' /%3E%3Ccircle cx='1300' cy='100' r='100' fill='%23FF000034' /%3E%3Ccircle cx='900' cy='200' r='120' fill='%2300FF0034' /%3E%3C/svg%3E");
         animation: stars 200s infinite linear;
     }
