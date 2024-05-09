@@ -24,6 +24,7 @@ public partial class Index
     bool allPlayerPlayed = false;
     readonly HashSet<string> allPlayerPlayedList = [];
     readonly Dictionary<string, (DateTime Date, string color, int Period)> lostPlayers = [];
+    bool dialogShown = false;
     public async Task UserClicked(Cell cell)
     {
 
@@ -96,8 +97,43 @@ public partial class Index
         livePlayerList = finalPlayerLeft;
         count = pos;
     }
+    bool IsMoreThanOnePlayerAlive()
+    {
+        var alivePlayer = new HashSet<string>();
+        for (var i = 0; i < gridOfCells.Count; i++)
+        {
+            for (int j = 0; j < gridOfCells[0].Count; j++)
+            {
+                var cell = gridOfCells[i][j];
+                if (cell.CurrentCount > 0)
+                {
+                    alivePlayer.Add(cell.Name);
+                }
+            }
+        }
+        return alivePlayer.Count > 1;
+    }
+    void RecursiveLookUp()
+    {
+        if (!dialogShown)
+        {
+            if (Config.Kampan || Config.Dhwani)
+            {
+                _ = Feedback();
+            }
+            if (allPlayerPlayed && !IsMoreThanOnePlayerAlive())
+            {
+                CalculateScore();
+                if (livePlayerList.Count == 1)
+                {
+                    ShowLeaderBoard();
+                }
+            }
+        }
+    }
     void ShowLeaderBoard()
     {
+        dialogShown = true;
         lostPeriodForPlayerIndexingInLeaderboard++;
         lostPlayers.TryAdd(livePlayerList[0].Name,
             (DateTime.Now, livePlayerList[0].HoverColorFormed(), lostPeriodForPlayerIndexingInLeaderboard));
@@ -124,9 +160,12 @@ public partial class Index
         cell.CurrentCount++;
         cell.Name = livePlayerList[count].Name;
         cell.Color = livePlayerList[count].ColorFormed();
-
+        
         if (cell.CurrentCount > cell.Capacity)
         {
+            RecursiveLookUp(); // take care of Infinite Case 
+            // Bug Founed by Abhijeet Kumar
+
             cell.CurrentCount = 0;
             cell.Name = string.Empty;
             #region neighbour 
@@ -150,8 +189,11 @@ public partial class Index
             }
             #endregion
         }
+    } 
+    private async Task Feedback()
+    {
+        await JSRuntime.InvokeVoidAsync("blazorFunctions.BhukampLao",Config.Kampan,Config.Dhwani);
     }
-
     #region Setting Up Enviroment
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

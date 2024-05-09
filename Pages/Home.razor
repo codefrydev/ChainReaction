@@ -27,6 +27,12 @@
                             <MudSelectItem T="int" Value="6" />
                         </MudSelect>
                     </MudListItem>
+                    <MudListItem>
+                        <MudExpansionPanel Class="custom-expansion" Text="Optional">
+                            <MudCheckBox @bind-Value="@Config.Kampan" Label="Vibrate" />
+                            <MudCheckBox @bind-Value="@Config.Dhwani" Label="Sound" />
+                        </MudExpansionPanel>
+                    </MudListItem>
                     <MudListItem> 
 
                         <MudPaper Style="background-color: transparent; display: flex; justify-content: center; align-items: center;" Elevation="0">
@@ -37,7 +43,7 @@
                                 Start Game
                             </MudButton>
                         </MudPaper>
-                    </MudListItem>
+                    </MudListItem> 
                 </MudList>
 
             </MudPaper>
@@ -63,5 +69,10 @@
 
     .custom-label-color .mud-input-label {
         background-color: #e5e9f4 !important;
-    } 
+    }  
+    .custom-expansion {
+        background-color: #ffffff4d;
+        border-radius:4px;
+    }
+
 </style>

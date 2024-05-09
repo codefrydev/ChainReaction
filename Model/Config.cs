@@ -4,6 +4,8 @@ namespace ChainReaction.Model
 {
     public class Config
     {
+        public static bool Kampan {get;set;} = false;
+        public static bool Dhwani {get;set;} = false;
         public static bool Icon { get; set; } = true;
         [Range(10, 1000)]
         public static int DelayTimeInMilliSecond { get; set; } = 20;
