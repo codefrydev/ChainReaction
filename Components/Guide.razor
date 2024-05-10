@@ -1,23 +1,25 @@
-﻿<MudDialog>
+﻿<MudDialog Style="background-color:#ffffffd6;border:4px solid #ffffffb3; border-radius:30px;box-shadow:inset;">
     <DialogContent>
-        <MudExpansionPanels >
-            <MudExpansionPanel Text="General">
+        <MudExpansionPanels Style=" border-radius:30px;box-shadow:inset;">
+            <MudExpansionPanel Text="General" DisableGutters=true Class="pl-3" Dense=true>
                 <pre>
                 <code>
 Each Cell Can Hold Only One Type Of Orbs
-A player can't place orbs on other player cells 
+One can't place orbs on other player cells 
 A minimum of 2 Players is required to play
 Player Chance Comes is Like a Queue
 Example: Suppose you Choose 3 Player 
-If Player Order  Is : [1,2,3], the chance will be [1,2,3,1,2,3,..] 
-Suppose 2 Got Eliminated while Player 1 was playing 
+If Player Order  Is : [1,2,3],
+The chance will be [1,2,3,1,2,3,..] 
+Suppose 2 Got Eliminated while 
+Player 1 was playing 
 Then Order is [1,3,1,3,1,3,1,3,..]
 The last Standing Player will be a winner.
                             </code>
                         </pre> 
             </MudExpansionPanel>
-            <MudExpansionPanel Text="Corner Cells behaviour"  >
-                <MudImage Src="CornerRule.gif" Height="400" /> <pre>
+            <MudExpansionPanel Text="Corner Cells behaviour" DisableGutters=true Class="pl-3" Dense=true>
+                <MudImage Src="CornerRule.gif" Fluid=true /> <pre>
                 <code>
 Each Corner Cell can hold Only One Orb
 On Placing another orb, it will burst
@@ -27,8 +29,8 @@ A total of Two Cells
                         </code>
                     </pre> 
             </MudExpansionPanel> 
-            <MudExpansionPanel Text="Edge Cells behaviour">
-                <MudImage Src="EdgeRule.gif" Height="400" />
+            <MudExpansionPanel Text="Edge Cells behaviour" DisableGutters=true Class="pl-3" Dense=true>
+                <MudImage Src="EdgeRule.gif" Fluid=true />
                 <pre>
                 <code>
 Each Edge Cell can hold up to two Orbs
@@ -39,11 +41,12 @@ A total of Three Cells
                         </code>
                     </pre> 
             </MudExpansionPanel>
-            <MudExpansionPanel Text="Rest Cells behaviour">
-                <MudImage Src="RestRule.gif" Height="400" />
+            <MudExpansionPanel Text="Rest Cells behaviour" DisableGutters=true Class="pl-3 mb-4" Dense=true>
+                <MudImage Src="RestRule.gif" Fluid=true />
                 <pre>
                 <code>
-Cells Other than Corner and Edge can hold up to two Orbs
+Cells Other than Corner and Edge 
+can hold up to four Orbs
 On Placing four orb, it will burst
 Empty its place and take over the adjacent 
 vertically and horizontal neighbor cells

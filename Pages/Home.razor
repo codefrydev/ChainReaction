@@ -15,7 +15,14 @@
                         </MudText>
                     </MudListItem>
                     <MudListItem>
-                        <MudSelect T="int"
+                        <MudRadioGroup @bind-Value="@Config.NumberOfPlayer" T="int">
+                            <MudRadio Value="2" Color="Color.Secondary" Size="Size.Large">2 Player</MudRadio>
+                            <MudRadio Value="3" Color="Color.Secondary" Size="Size.Large">3 Player</MudRadio>
+                            <MudRadio Value="4" Color="Color.Secondary" Size="Size.Large">4 Player</MudRadio>
+                            <MudRadio Value="5" Color="Color.Secondary" Size="Size.Large">5 Player</MudRadio>
+                            <MudRadio Value="6" Color="Color.Secondary" Size="Size.Large">6 Player</MudRadio>
+                        </MudRadioGroup>
+                        @* <MudSelect T="int"
                                    Label="Number of Player"
                                    Variant="Variant.Outlined"
                                    AnchorOrigin="Origin.BottomCenter"
@@ -26,10 +33,10 @@
                             <MudSelectItem T="int" Value="4" />
                             <MudSelectItem T="int" Value="5" />
                             <MudSelectItem T="int" Value="6" />
-                        </MudSelect>
+                        </MudSelect> *@
                     </MudListItem>
                     <MudListItem>
-                        <MudExpansionPanel Class="custom-expansion" Text="Optional">
+                        <MudExpansionPanel Class="custom-expansion" Text="Optional" Style="border-radius:8px">
                             <MudCheckBox @bind-Value="@Config.Kampan" Label="Vibrate" />
                             <MudCheckBox @bind-Value="@Config.Dhwani" Label="Sound" />
                             <MudCheckBox @bind-Value="@Config.IsCusTomDimention" Label="Check for Custom Dimention" />
@@ -51,7 +58,7 @@
                                        Color="Color.Info"
                                        Size="Size.Large"
                                        OnClick="StartGame">
-                                Play
+                            Play with @Config.NumberOfPlayer Player
                             </MudButton>
                         </MudPaper>
                     </MudListItem> 

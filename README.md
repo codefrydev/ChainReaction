@@ -1,6 +1,6 @@
 # ChainReaction
 
-## General Rule wwwroot/three.png 
+## General Rule
 
 - Each Cell Can Hold Only One Type Of Orbs
 - A player can't place orbs on other player cells 
@@ -30,7 +30,7 @@
 
 ## Rest Cells behaviour
 ![Corner Cells](wwwroot/RestRule.gif) 
-- Cells Other than Corner and Edge can hold up to two Orbs
+- Cells Other than Corner and Edge can hold up to four Orbs
 - On Placing four orb, it will burst
 - Empty its place and take over the adjacent 
 - vertically and horizontal neighbor cells
