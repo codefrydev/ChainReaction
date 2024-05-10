@@ -1,6 +1,7 @@
 ﻿@page "/"
 
-<SlidingBubble/>
+<SlidingBubble/> 
+<HelpButton/>
 <div class="container" style="background-color:transparent">
     <div class="content" style="background-color:transparent">
         <MudPaper MaxWidth="720px" Elevation="0" Style="background-color:transparent">
@@ -31,16 +32,26 @@
                         <MudExpansionPanel Class="custom-expansion" Text="Optional">
                             <MudCheckBox @bind-Value="@Config.Kampan" Label="Vibrate" />
                             <MudCheckBox @bind-Value="@Config.Dhwani" Label="Sound" />
+                            <MudCheckBox @bind-Value="@Config.IsCusTomDimention" Label="Check for Custom Dimention" />
+                            @if(Config.IsCusTomDimention)
+                            {
+                                <MudNumericField HideSpinButtons="true" 
+                                    @bind-Value="Config.Rows" Label="Number of rows"
+                                    Variant="Variant.Outlined" Step="10" Min="4" Max="100" />
+                                <MudNumericField HideSpinButtons="true"
+                                    @bind-Value="Config.Column" Label="Number of columns"
+                                    Variant="Variant.Outlined" Step="10" Min="4" Max="100"/>
+                            }
                         </MudExpansionPanel>
                     </MudListItem>
                     <MudListItem> 
 
-                        <MudPaper Style="background-color: transparent; display: flex; justify-content: center; align-items: center;" Elevation="0">
+                        <MudPaper Style="background-color: transparent; display: flex; justify-content: center; align-items: center;" Elevation="0"> 
                             <MudButton Variant="Variant.Filled"
                                        Color="Color.Info"
                                        Size="Size.Large"
                                        OnClick="StartGame">
-                                Start Game
+                                Play
                             </MudButton>
                         </MudPaper>
                     </MudListItem> 

@@ -1,0 +1,21 @@
+﻿<div class="d-flex" style="position: fixed;top:0; left: 0; z-index:999; background-color:transparent; border-radius:15%; margin:15px;">
+    <MudIconButton Icon="@Icons.Material.Filled.QuestionMark"
+                   Class="ma-5"
+                   Color="Color.Tertiary"
+                   Size="Size.Large"
+                   OnClick="OpenDialog" aria-label="Guide">
+    </MudIconButton>
+</div>
+
+@code{
+    [Inject] public IDialogService DialogService { get; set; } = null!;
+    private void OpenDialog()
+    {
+        var options = new DialogOptions
+            {
+                CloseOnEscapeKey = true,
+                CloseButton = true,
+            };
+        DialogService.Show<Guide>("How To Play/ Rules", options);
+    }
+}

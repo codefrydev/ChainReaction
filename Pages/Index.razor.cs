@@ -39,6 +39,7 @@ public partial class Index
                 CalculateScore();
                 if (livePlayerList.Count == 1)
                 {
+                    await Task.Delay(1000);
                     ShowLeaderBoard();
                 }
             }
@@ -126,6 +127,7 @@ public partial class Index
                 CalculateScore();
                 if (livePlayerList.Count == 1)
                 {
+                    Task.Delay(1000);
                     ShowLeaderBoard();
                 }
             }
@@ -219,9 +221,15 @@ public partial class Index
     }
     void Reset()
     {
-        livePlayerList = Config.PlayerList.Take(Config.NumberOfPlayer).ToList();
-        gridOfCells = [];
 
+        livePlayerList = Config.SuffeledArray(Config.PlayerList.Take(Config.NumberOfPlayer).ToList());
+        Config.CurrentUserColor = livePlayerList[0].ColorFormed();
+        gridOfCells = [];
+        if(Config.IsCusTomDimention &&Config.Rows>=4 && Config.Rows<=100 && Config.Column>=4 && Config.Column<=100)
+        { 
+            row = Config.Rows;
+            column = Config.Column;
+        }
         for (int i = 0; i < row; i++)
         {
             var ls = new List<Cell>();
