@@ -30,7 +30,7 @@
 
 ## Rest Cells behaviour
 ![Corner Cells](wwwroot/RestRule.gif) 
-- Cells Other than Corner and Edge can hold up to four Orbs
+- Cells Other than Corner and Edge can hold up to three Orbs
 - On Placing four orb, it will burst
 - Empty its place and take over the adjacent 
 - vertically and horizontal neighbor cells
