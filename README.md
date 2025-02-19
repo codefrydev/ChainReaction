@@ -10,7 +10,7 @@
 - If Player Order  Is : [1,2,3], the chance will be [1,2,3,1,2,3,..] 
 - Suppose 2 Got Eliminated while Player 1 was playing 
 - Then Order is [1,3,1,3,1,3,1,3,..]
-- The last Standing Player will be a winner. 
+- The last Standing Player will be a winner.
 
 ## Corner Cells behaviour
 ![Corner Cells](wwwroot/CornerRule.gif) 
