@@ -42,6 +42,75 @@
                 </div>
             </div>
 
+            <!-- Player Color Customization - Cartoon Style -->
+            <details class="group bg-gradient-to-br from-purple-100/70 to-pink-100/70 backdrop-blur rounded-2xl p-4 md:p-5 border-3 border-purple-600/40 hover:border-purple-700/60 transition-all shadow-cartoon">
+                <summary class="cursor-pointer font-bold text-purple-900 flex items-center justify-between select-none text-cartoon">
+                    <span class="flex items-center gap-2 text-sm md:text-base" style="font-family: 'Comic Sans MS', cursive;">
+                        <svg class="w-5 h-5 md:w-6 md:h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        </svg>
+                        🎨 Customize Player Colors
+                    </span>
+                    <svg class="w-5 h-5 md:w-6 md:h-6 text-purple-700 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </summary>
+                <div class="mt-4 md:mt-5 space-y-3">
+                    @for (int i = 0; i < Config.NumberOfPlayer && i < Config.PlayerList.Count; i++)
+                    {
+                        var player = Config.PlayerList[i];
+                        var index = i;
+                        <div class="p-3 rounded-xl bg-white/70 border-2 border-purple-500/30 shadow-sm animate-slide-up" style="animation-delay: @((i * 0.1))s">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-8 h-8 rounded-full shadow-md border-3 border-purple-600 transition-all" 
+                                     style="background: @player.ColorFormed();"></div>
+                                <span class="font-bold text-sm md:text-base text-purple-900" style="font-family: 'Comic Sans MS', cursive;">
+                                    @player.Name
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-red-700 mb-1" style="font-family: 'Comic Sans MS', cursive;">🔴 Red</label>
+                                    <input type="range" min="0" max="255" 
+                                           value="@player.RColor" 
+                                           @oninput="@(e => UpdatePlayerColor(index, 'R', int.Parse(e.Value?.ToString() ?? "0")))"
+                                           class="w-full h-2 bg-red-200 rounded-lg appearance-none cursor-pointer accent-red-500" />
+                                    <div class="text-center text-xs font-bold text-red-900 mt-1">@player.RColor</div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-green-700 mb-1" style="font-family: 'Comic Sans MS', cursive;">🟢 Green</label>
+                                    <input type="range" min="0" max="255" 
+                                           value="@player.GColor" 
+                                           @oninput="@(e => UpdatePlayerColor(index, 'G', int.Parse(e.Value?.ToString() ?? "0")))"
+                                           class="w-full h-2 bg-green-200 rounded-lg appearance-none cursor-pointer accent-green-500" />
+                                    <div class="text-center text-xs font-bold text-green-900 mt-1">@player.GColor</div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-blue-700 mb-1" style="font-family: 'Comic Sans MS', cursive;">🔵 Blue</label>
+                                    <input type="range" min="0" max="255" 
+                                           value="@player.BColor" 
+                                           @oninput="@(e => UpdatePlayerColor(index, 'B', int.Parse(e.Value?.ToString() ?? "0")))"
+                                           class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-500" />
+                                    <div class="text-center text-xs font-bold text-blue-900 mt-1">@player.BColor</div>
+                                </div>
+                            </div>
+                            <div class="mt-2 flex gap-2">
+                                <input type="color" 
+                                       value="@RgbToHex(player.RColor, player.GColor, player.BColor)" 
+                                       @onchange="@(e => UpdatePlayerColorFromHex(index, e.Value?.ToString() ?? "#000000"))"
+                                       class="w-full h-10 rounded-lg cursor-pointer border-2 border-purple-600" 
+                                       title="Pick a color" />
+                                <button @onclick="@(() => ResetPlayerColor(index))" 
+                                        class="px-3 py-2 rounded-lg bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold text-xs shadow-md hover:shadow-lg transition-all border-2 border-amber-600"
+                                        style="font-family: 'Comic Sans MS', cursive;">
+                                    🔄 Reset
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </details>
+
             <!-- Optional Settings - Cartoon Style -->
             <details class="group bg-gradient-to-br from-white/70 to-yellow-50/70 backdrop-blur rounded-2xl p-4 md:p-5 border-3 border-amber-600/40 hover:border-amber-700/60 transition-all shadow-cartoon">
                 <summary class="cursor-pointer font-bold text-amber-900 flex items-center justify-between select-none text-cartoon">
@@ -122,6 +191,17 @@
 </div>
 
 @code {
+    // Store default colors for reset functionality
+    private static readonly List<(int R, int G, int B)> DefaultColors = new()
+    {
+        (70, 130, 180),   // Blue Cat
+        (205, 133, 63),   // Brown Mouse
+        (255, 140, 0),    // Orange
+        (255, 215, 0),    // Yellow Cheese
+        (60, 179, 113),   // Green
+        (147, 112, 219)   // Purple
+    };
+
     private void SelectPlayerCount(int count)
     {
         Config.NumberOfPlayer = count;
@@ -141,5 +221,69 @@
         {
             return $"{baseClass} border-amber-600/40 bg-white/90 text-amber-800 hover:bg-yellow-50 hover:border-amber-600";
         }
+    }
+
+    private void UpdatePlayerColor(int playerIndex, char colorChannel, int value)
+    {
+        if (playerIndex >= 0 && playerIndex < Config.PlayerList.Count)
+        {
+            var player = Config.PlayerList[playerIndex];
+            switch (colorChannel)
+            {
+                case 'R':
+                    player.RColor = value;
+                    break;
+                case 'G':
+                    player.GColor = value;
+                    break;
+                case 'B':
+                    player.BColor = value;
+                    break;
+            }
+            StateHasChanged();
+        }
+    }
+
+    private void UpdatePlayerColorFromHex(int playerIndex, string hexColor)
+    {
+        if (playerIndex >= 0 && playerIndex < Config.PlayerList.Count && !string.IsNullOrEmpty(hexColor))
+        {
+            // Remove # if present
+            hexColor = hexColor.TrimStart('#');
+            
+            if (hexColor.Length == 6)
+            {
+                try
+                {
+                    var player = Config.PlayerList[playerIndex];
+                    player.RColor = Convert.ToInt32(hexColor.Substring(0, 2), 16);
+                    player.GColor = Convert.ToInt32(hexColor.Substring(2, 2), 16);
+                    player.BColor = Convert.ToInt32(hexColor.Substring(4, 2), 16);
+                    StateHasChanged();
+                }
+                catch
+                {
+                    // Invalid hex color, ignore
+                }
+            }
+        }
+    }
+
+    private void ResetPlayerColor(int playerIndex)
+    {
+        if (playerIndex >= 0 && playerIndex < Config.PlayerList.Count && playerIndex < DefaultColors.Count)
+        {
+            var player = Config.PlayerList[playerIndex];
+            var defaultColor = DefaultColors[playerIndex];
+            player.RColor = defaultColor.R;
+            player.GColor = defaultColor.G;
+            player.BColor = defaultColor.B;
+            StateHasChanged();
+        }
+    }
+
+    private string RgbToHex(int r, int g, int b)
+    {
+        return $"#{r:X2}{g:X2}{b:X2}";
     }
 }
