@@ -1,0 +1,58 @@
+@namespace ChainReaction.Components
+
+@if (IsOpen)
+{
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-4" @onclick="OnBackdropClick">
+        <div class="relative bg-gradient-to-br from-amber-50/98 to-yellow-50/98 backdrop-blur-xl rounded-3xl shadow-2xl ring-4 ring-amber-800/40 w-full max-w-[min(90vw,850px)] max-h-[90vh] overflow-auto animate-scale-in border-4 border-amber-700/50" @onclick:stopPropagation>
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <div class="px-6 py-5 border-b-3 border-amber-600/40 bg-gradient-to-r from-amber-100/80 to-yellow-100/80">
+                    <h2 class="text-2xl md:text-3xl font-black text-amber-900 text-cartoon" style="font-family: 'Chewy', cursive;">@Title</h2>
+                </div>
+            }
+            <div class="p-4 md:p-6">
+                @ChildContent
+            </div>
+            @if (Footer is not null)
+            {
+                <div class="px-6 py-5 border-t-3 border-amber-600/40 bg-gradient-to-r from-amber-100/80 to-yellow-100/80">
+                    @Footer
+                </div>
+            }
+            <button class="absolute top-3 right-3 md:top-4 md:right-4 h-10 w-10 md:h-12 md:w-12 flex items-center justify-center rounded-2xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-110 hover:rotate-90 active:scale-95 border-3 border-red-800" 
+                    @onclick="Close"
+                    aria-label="Close">
+                <svg class="w-5 h-5 md:w-6 md:h-6 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
+    [Parameter] public bool CloseOnBackdrop { get; set; } = true;
+
+    private async Task Close()
+    {
+        if (IsOpenChanged.HasDelegate)
+        {
+            await IsOpenChanged.InvokeAsync(false);
+        }
+    }
+
+    private async Task OnBackdropClick()
+    {
+        if (CloseOnBackdrop)
+        {
+            await Close();
+        }
+    }
+}
+
+

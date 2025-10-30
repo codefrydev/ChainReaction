@@ -1,67 +1,109 @@
-﻿<MudDialog Style="background-color:#ffffffd6;border:4px solid #ffffffb3; border-radius:30px;box-shadow:inset;">
-    <DialogContent>
-        <MudExpansionPanels Style=" border-radius:30px;box-shadow:inset;">
-            <MudExpansionPanel Text="General" DisableGutters=true Class="pl-3" Dense=true>
-                <pre>
-                <code>
-Each Cell Can Hold Only One Type Of Orbs
-One can't place orbs on other player cells 
-A minimum of 2 Players is required to play
-Player Chance Comes is Like a Queue
-Example: Suppose you Choose 3 Player 
-If Player Order  Is : [1,2,3],
-The chance will be [1,2,3,1,2,3,..] 
-Suppose 2 Got Eliminated while 
-Player 1 was playing 
-Then Order is [1,3,1,3,1,3,1,3,..]
-The last Standing Player will be a winner.
-                            </code>
-                        </pre> 
-            </MudExpansionPanel>
-            <MudExpansionPanel Text="Corner Cells behaviour" DisableGutters=true Class="pl-3" Dense=true>
-                <MudImage Src="CornerRule.gif" Fluid=true /> <pre>
-                <code>
-Each Corner Cell can hold Only One Orb
-On Placing another orb, it will burst
-Empty its place and take over the adjacent 
-vertically and horizontal neighbor cells 
-A total of Two Cells
-                        </code>
-                    </pre> 
-            </MudExpansionPanel> 
-            <MudExpansionPanel Text="Edge Cells behaviour" DisableGutters=true Class="pl-3" Dense=true>
-                <MudImage Src="EdgeRule.gif" Fluid=true />
-                <pre>
-                <code>
-Each Edge Cell can hold up to two Orbs
-On Placing the third orb, it will burst
-Empty its place and take over the adjacent 
-vertically and horizontal neighbor cells
-A total of Three Cells
-                        </code>
-                    </pre> 
-            </MudExpansionPanel>
-            <MudExpansionPanel Text="Rest Cells behaviour" DisableGutters=true Class="pl-3 mb-4" Dense=true>
-                <MudImage Src="RestRule.gif" Fluid=true />
-                <pre>
-                <code>
-Cells Other than Corner and Edge 
-can hold up to three Orbs
-On Placing four orb, it will burst
-Empty its place and take over the adjacent 
-vertically and horizontal neighbor cells
-A total of four Cells
-                        </code>
-                    </pre> 
-            </MudExpansionPanel>
-        </MudExpansionPanels>
-    </DialogContent> 
-</MudDialog>
+﻿<div class="max-w-4xl space-y-4 md:space-y-6">
+    
+    <!-- General Rules Card - Cartoon Style -->
+    <details class="group bg-gradient-to-br from-blue-100 to-sky-100 rounded-2xl overflow-hidden border-3 border-blue-600/50 shadow-cartoon hover:shadow-cartoon-lg transition-all" open>
+        <summary class="cursor-pointer px-4 md:px-6 py-3 md:py-4 font-black text-base md:text-lg text-blue-900 flex items-center justify-between select-none hover:bg-blue-200/50 transition-colors text-cartoon" style="font-family: 'Comic Sans MS', cursive;">
+            <span class="flex items-center gap-2 md:gap-3">
+                <svg class="w-5 h-5 md:w-6 md:h-6 text-blue-700" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                </svg>
+                📋 General Rules
+            </span>
+            <svg class="w-5 h-5 md:w-6 md:h-6 text-blue-700 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+        </summary>
+        <div class="px-4 md:px-6 py-3 md:py-4 bg-white/80 backdrop-blur">
+            <ul class="space-y-3 text-sm md:text-base text-blue-900 font-semibold" style="font-family: 'Comic Sans MS', cursive;">
+                <li class="flex items-start gap-2 md:gap-3">
+                    <span class="text-xl md:text-2xl flex-shrink-0">✅</span>
+                    <span><strong class="text-blue-800">Cell ownership:</strong> Each cell can hold only one type of orbs</span>
+                </li>
+                <li class="flex items-start gap-2 md:gap-3">
+                    <span class="text-xl md:text-2xl flex-shrink-0">✅</span>
+                    <span><strong class="text-blue-800">Placement rules:</strong> You can't place orbs on other player's cells</span>
+                </li>
+                <li class="flex items-start gap-2 md:gap-3">
+                    <span class="text-xl md:text-2xl flex-shrink-0">✅</span>
+                    <span><strong class="text-blue-800">Players:</strong> A minimum of 2 players is required</span>
+                </li>
+                <li class="flex items-start gap-2 md:gap-3">
+                    <span class="text-xl md:text-2xl flex-shrink-0">✅</span>
+                    <span><strong class="text-blue-800">Turn order:</strong> Players take turns in queue order. Eliminated players are skipped</span>
+                </li>
+                <li class="flex items-start gap-2 md:gap-3">
+                    <span class="text-xl md:text-2xl flex-shrink-0">🏆</span>
+                    <span><strong class="text-blue-800">Victory:</strong> The last player standing wins!</span>
+                </li>
+            </ul>
+        </div>
+    </details>
 
+    <!-- Corner Cells Card - Cartoon Style -->
+    <details class="group bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl overflow-hidden border-3 border-amber-600/50 shadow-cartoon hover:shadow-cartoon-lg transition-all">
+        <summary class="cursor-pointer px-4 md:px-6 py-3 md:py-4 font-black text-base md:text-lg text-amber-900 flex items-center justify-between select-none hover:bg-amber-200/50 transition-colors text-cartoon" style="font-family: 'Comic Sans MS', cursive;">
+            <span class="flex items-center gap-2 md:gap-3">
+                <div class="h-7 w-7 md:h-8 md:w-8 rounded-xl bg-amber-500 flex items-center justify-center text-white font-black shadow-md border-2 border-amber-700">1</div>
+                📐 Corner Cells
+            </span>
+            <svg class="w-5 h-5 md:w-6 md:h-6 text-amber-700 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+        </summary>
+        <div class="px-4 md:px-6 py-3 md:py-4 bg-white/80 backdrop-blur space-y-3 md:space-y-4">
+            <img src="CornerRule.gif" class="w-full rounded-2xl shadow-lg border-3 border-amber-600/30" alt="Corner Cell Rule Demonstration" />
+            <div class="p-3 md:p-4 bg-amber-50/80 rounded-2xl border-3 border-amber-500/50 shadow-md">
+                <p class="text-sm md:text-base text-amber-900 leading-relaxed font-bold" style="font-family: 'Comic Sans MS', cursive;">
+                    <strong class="text-amber-800">💥 Capacity:</strong> Each corner cell can hold <strong>only 1 orb</strong>.<br/>
+                    <strong class="text-amber-800">💥 Burst:</strong> Placing another orb causes it to burst, emptying the cell and spreading to <strong>2 adjacent cells</strong> (vertical and horizontal neighbors).
+                </p>
+            </div>
+        </div>
+    </details>
 
-@code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    <!-- Edge Cells Card - Cartoon Style -->
+    <details class="group bg-gradient-to-br from-emerald-100 to-green-100 rounded-2xl overflow-hidden border-3 border-emerald-600/50 shadow-cartoon hover:shadow-cartoon-lg transition-all">
+        <summary class="cursor-pointer px-4 md:px-6 py-3 md:py-4 font-black text-base md:text-lg text-emerald-900 flex items-center justify-between select-none hover:bg-emerald-200/50 transition-colors text-cartoon" style="font-family: 'Comic Sans MS', cursive;">
+            <span class="flex items-center gap-2 md:gap-3">
+                <div class="h-7 w-7 md:h-8 md:w-8 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-black shadow-md border-2 border-emerald-700">2</div>
+                ⬜ Edge Cells
+            </span>
+            <svg class="w-5 h-5 md:w-6 md:h-6 text-emerald-700 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+        </summary>
+        <div class="px-4 md:px-6 py-3 md:py-4 bg-white/80 backdrop-blur space-y-3 md:space-y-4">
+            <img src="EdgeRule.gif" class="w-full rounded-2xl shadow-lg border-3 border-emerald-600/30" alt="Edge Cell Rule Demonstration" />
+            <div class="p-3 md:p-4 bg-emerald-50/80 rounded-2xl border-3 border-emerald-500/50 shadow-md">
+                <p class="text-sm md:text-base text-emerald-900 leading-relaxed font-bold" style="font-family: 'Comic Sans MS', cursive;">
+                    <strong class="text-emerald-800">💥 Capacity:</strong> Each edge cell can hold up to <strong>2 orbs</strong>.<br/>
+                    <strong class="text-emerald-800">💥 Burst:</strong> Placing a third orb causes it to burst, emptying the cell and spreading to <strong>3 adjacent cells</strong> (vertical and horizontal neighbors).
+                </p>
+            </div>
+        </div>
+    </details>
 
-    void Submit() => MudDialog.Close(DialogResult.Ok(true));
-    void Cancel() => MudDialog.Cancel();
-}
+    <!-- Center Cells Card - Cartoon Style -->
+    <details class="group bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl overflow-hidden border-3 border-purple-600/50 shadow-cartoon hover:shadow-cartoon-lg transition-all">
+        <summary class="cursor-pointer px-4 md:px-6 py-3 md:py-4 font-black text-base md:text-lg text-purple-900 flex items-center justify-between select-none hover:bg-purple-200/50 transition-colors text-cartoon" style="font-family: 'Comic Sans MS', cursive;">
+            <span class="flex items-center gap-2 md:gap-3">
+                <div class="h-7 w-7 md:h-8 md:w-8 rounded-xl bg-purple-500 flex items-center justify-center text-white font-black shadow-md border-2 border-purple-700">3</div>
+                ⭐ Center Cells
+            </span>
+            <svg class="w-5 h-5 md:w-6 md:h-6 text-purple-700 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+        </summary>
+        <div class="px-4 md:px-6 py-3 md:py-4 bg-white/80 backdrop-blur space-y-3 md:space-y-4">
+            <img src="RestRule.gif" class="w-full rounded-2xl shadow-lg border-3 border-purple-600/30" alt="Center Cell Rule Demonstration" />
+            <div class="p-3 md:p-4 bg-purple-50/80 rounded-2xl border-3 border-purple-500/50 shadow-md">
+                <p class="text-sm md:text-base text-purple-900 leading-relaxed font-bold" style="font-family: 'Comic Sans MS', cursive;">
+                    <strong class="text-purple-800">💥 Capacity:</strong> Center cells (neither corner nor edge) can hold up to <strong>3 orbs</strong>.<br/>
+                    <strong class="text-purple-800">💥 Burst:</strong> Placing a fourth orb causes it to burst, emptying the cell and spreading to <strong>4 adjacent cells</strong> (vertical and horizontal neighbors).
+                </p>
+            </div>
+        </div>
+    </details>
+
+</div>

@@ -1,35 +1,192 @@
 ﻿@page "/Game"
 
-<PageTitle>Chain Reaction</PageTitle>
-@if(gridOfCells is not null)
+<PageTitle>Chain Reaction - Game</PageTitle>
+
+@if(gridOfCells is not null && gridOfCells.Count > 0)
 {
-    <MudContainer Class="center-container">
-
-        <MudPaper Class="d-flex flex-column gap pa-2" Elevation="1">
-            @foreach (var item in gridOfCells)
-            {
-                <MudPaper Class="d-flex flex-row flex-grow-1 gap-0" Elevation="0">
-                    @foreach (var cell in item)
-                    {
-                        <div @onclick="@(()=>UserClicked(cell))" >
-                            <CellComponent cell="cell" />
-                        </div>
-                    }
-
-                </MudPaper>
-            }
-        </MudPaper>
-
-    </MudContainer>
+    <div class="flex justify-center items-center min-h-screen p-4 bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50">
+        <div class="relative">
+            <!-- Game Board Container - Dynamic Color Based on Current Player -->
+            <div class="inline-flex flex-col backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden transition-all duration-500" 
+                 style="background: linear-gradient(135deg, color-mix(in srgb, @Config.CurrentUserColor 15%, #FFF8DC), color-mix(in srgb, @Config.CurrentUserColor 25%, #FFEAA7)); border: 5px solid @Config.CurrentUserColor; box-shadow: 0 25px 50px -12px color-mix(in srgb, @Config.CurrentUserColor 40%, transparent), 0 0 0 4px color-mix(in srgb, @Config.CurrentUserColor 20%, transparent);">
+                <!-- Current Player Indicator - Cartoon Style -->
+                <div class="absolute -top-14 md:-top-16 left-1/2 transform -translate-x-1/2 px-4 md:px-6 py-2 md:py-3 rounded-2xl font-black shadow-2xl animate-bounce-cartoon whitespace-nowrap text-sm md:text-base transition-all duration-500" 
+                     style="background: linear-gradient(135deg, @Config.CurrentUserColor, color-mix(in srgb, @Config.CurrentUserColor 80%, #FFA500)); border: 3px solid color-mix(in srgb, @Config.CurrentUserColor 150%, #000000); color: color-mix(in srgb, @Config.CurrentUserColor 10%, #000000); font-family: 'Comic Sans MS', cursive;">
+                    <div class="flex items-center gap-2 md:gap-3">
+                        <div class="w-4 h-4 md:w-5 md:h-5 rounded-full shadow-lg border-2" style="background: @Config.CurrentUserColor; border-color: color-mix(in srgb, @Config.CurrentUserColor 150%, #000000);"></div>
+                        <span class="text-cartoon drop-shadow-md">▶️ Current Player</span>
+                    </div>
+                </div>
+                
+                @foreach (var item in gridOfCells)
+                {
+                    <div class="flex flex-row">
+                        @foreach (var cell in item)
+                        {
+                            <CellComponent cell="cell" OnClick="@(()=>UserClicked(cell))" />
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="flex justify-center items-center min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50">
+        <div class="text-center space-y-6">
+            <div class="cheese-loader mx-auto"></div>
+            <p class="text-xl md:text-2xl font-black text-amber-900 animate-bounce-cartoon" style="font-family: 'Comic Sans MS', cursive; text-shadow: 2px 2px 0px rgba(255,255,255,0.5);">
+                🧀 Preparing the Game Board... 🐭
+            </p>
+        </div>
+    </div>
+    <style>
+        .cheese-loader {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border-radius: 50%;
+            border: 5px solid #8B5A2B;
+            position: relative;
+            animation: rotate-cheese 2s linear infinite;
+            box-shadow: 0 10px 40px rgba(255,215,0,0.5);
+        }
+        .cheese-loader::before,
+        .cheese-loader::after {
+            content: '';
+            position: absolute;
+            background: #F5DEB3;
+            border-radius: 50%;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
+        }
+        .cheese-loader::before {
+            width: 20px;
+            height: 20px;
+            top: 20px;
+            left: 30px;
+        }
+        .cheese-loader::after {
+            width: 25px;
+            height: 25px;
+            bottom: 25px;
+            right: 25px;
+        }
+        @@keyframes rotate-cheese {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
 }
 
-<ToggleGraphicsComponent/>
+@if (dialogShown)
+{
+    <Modal @bind-IsOpen="dialogShown" Title="">
+        <ChildContent>
+            <div class="w-full max-w-2xl">
+                <!-- Leaderboard Header - Cartoon Style -->
+                <div class="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 rounded-t-3xl p-6 text-center border-b-4 border-amber-800">
+                    <div class="flex items-center justify-center gap-3 mb-2">
+                        <svg class="w-10 h-10 md:w-12 md:h-12 text-amber-900 animate-bounce-cartoon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        <h2 class="text-3xl md:text-4xl font-black text-amber-900 drop-shadow-lg text-cartoon" style="font-family: 'Chewy', cursive;">🏆 Leaderboard 🏆</h2>
+                        <svg class="w-10 h-10 md:w-12 md:h-12 text-amber-900 animate-bounce-cartoon" style="animation-delay: 0.2s" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                    </div>
+                    <p class="text-amber-900 font-bold text-sm md:text-base" style="font-family: 'Comic Sans MS', cursive;">🎮 Final Rankings 🎮</p>
+                </div>
 
-<style>
-    .center-container {
-        display: flex;
-        justify-content: center;
-        align-items: center; 
-        height:100vh;
+                <!-- Leaderboard Body - Cartoon Wood Style -->
+                <div class="bg-gradient-to-br from-amber-700 via-amber-800 to-amber-900 rounded-b-3xl p-4 md:p-6 border-4 border-amber-900">
+                    <div class="space-y-3">
+                        @{int position = 1;}
+                        @foreach (var player in ScoreLeaderWithTime.OrderByDescending(x=>x.Value.Period))
+                        {
+                            <div class="group relative flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl transition-all duration-300 hover:bg-yellow-500/30 backdrop-blur border-3 border-yellow-600/40 hover:border-yellow-500/60 animate-slide-up shadow-cartoon bg-amber-800/40" style="animation-delay: @((position - 1) * 0.1)s">
+                                <!-- Position Badge - Cartoon Style -->
+                                <div class="flex-shrink-0">
+                                    @if (position == 1)
+                                    {
+                                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center shadow-lg shadow-yellow-500/50 border-3 border-amber-700 animate-bounce-cartoon">
+                                            <span class="text-xl md:text-2xl">🏆</span>
+                                        </div>
+                                    }
+                                    else if (position == 2)
+                                    {
+                                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center shadow-lg shadow-slate-400/50 border-3 border-slate-600">
+                                            <span class="text-xl md:text-2xl">🥈</span>
+                                        </div>
+                                    }
+                                    else if (position == 3)
+                                    {
+                                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/50 border-3 border-orange-800">
+                                            <span class="text-xl md:text-2xl">🥉</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-amber-700 flex items-center justify-center border-3 border-yellow-600/50 shadow-md">
+                                            <span class="text-lg md:text-xl font-black text-yellow-300" style="font-family: 'Comic Sans MS', cursive;">@position</span>
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- Player Info - Cartoon Style -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <div class="w-4 h-4 md:w-5 md:h-5 rounded-full shadow-lg border-2 border-amber-900" style="background: @player.Value.color;"></div>
+                                        <h3 class="text-sm md:text-lg font-black text-yellow-100 truncate" style="font-family: 'Comic Sans MS', cursive; text-shadow: 2px 2px 0px rgba(0,0,0,0.3);">@player.Key</h3>
+                                    </div>
+                                    <p class="text-xs md:text-sm text-yellow-300/80 font-semibold">@player.Value.Date.ToString("MMM dd, yyyy HH:mm")</p>
+                                </div>
+
+                                <!-- Duration Badge - Cartoon Style -->
+                                <div class="flex-shrink-0 px-3 md:px-4 py-2 rounded-xl bg-yellow-400/20 border-2 border-yellow-500/40 shadow-md">
+                                    <div class="text-xs text-yellow-300 font-bold" style="font-family: 'Comic Sans MS', cursive;">⏱️ Time</div>
+                                    <div class="text-sm md:text-lg font-black text-yellow-100" style="font-family: 'Comic Sans MS', cursive; text-shadow: 1px 1px 0px rgba(0,0,0,0.3);">@FormatDuration(player.Value.Period)</div>
+                                </div>
+
+                                <!-- Decorative gradient border on hover -->
+                                <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-yellow-500/0 via-yellow-400/30 to-orange-500/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                            </div>
+                            position++;
+                        }
+                    </div>
+                </div>
+            </div>
+        </ChildContent>
+
+        <Footer>
+            <div class="flex justify-center gap-3">
+                <button class="cartoon-btn px-6 md:px-8 py-3 md:py-4 rounded-2xl bg-gradient-to-br from-yellow-400 via-amber-400 to-orange-500 text-amber-900 font-black shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 active:scale-95 border-3 border-amber-800" @onclick="GoHome" style="font-family: 'Chewy', cursive;">
+                    <span class="flex items-center gap-2 text-sm md:text-base">
+                        <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        🏠 Back to Home
+                    </span>
+                </button>
+            </div>
+        </Footer>
+    </Modal>
+}
+
+@code {
+    private string FormatDuration(int seconds)
+    {
+        if (seconds < 60)
+            return $"{seconds}s";
+        
+        int minutes = seconds / 60;
+        int remainingSeconds = seconds % 60;
+        
+        if (minutes < 60)
+            return $"{minutes}m {remainingSeconds}s";
+        
+        int hours = minutes / 60;
+        int remainingMinutes = minutes % 60;
+        return $"{hours}h {remainingMinutes}m";
     }
-</style>
+}

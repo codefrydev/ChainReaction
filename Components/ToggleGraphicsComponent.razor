@@ -1,12 +1,23 @@
-﻿<div class="d-flex"
-     style="position: fixed;top:0; left: 0; z-index:999; background-color:transparent; border-radius:15%; margin:5px;">
-    <MudToggleIconButton @bind-Toggled="@Toggleme"
-                         Icon="@Icons.Custom.Uncategorized.Radioactive"
-                         Color="@Color.Error"
-                         Title="Gpu Mode Hypnotise"
-                         ToggledIcon="@Icons.Custom.Uncategorized.AlertSuccess"
-                         ToggledColor="@Color.Success"
-                         ToggledTitle="Normal Mode" />
+﻿<div class="fixed top-20 left-4 z-[999]">
+    <button class="cartoon-btn group h-12 px-4 md:px-5 flex items-center gap-2 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-white font-black shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 border-3 border-blue-800" 
+            @onclick="() => Toggleme = !Toggleme" 
+            title="Toggle Graphics Mode"
+            style="font-family: 'Comic Sans MS', cursive;">
+        @if (Toggleme)
+        {
+            <svg class="w-5 h-5 md:w-6 md:h-6 transition-transform group-hover:rotate-180 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span class="text-xs md:text-sm text-shadow">⚡ GPU</span>
+        }
+        else
+        {
+            <svg class="w-5 h-5 md:w-6 md:h-6 transition-transform group-hover:scale-110 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-xs md:text-sm text-shadow">✓ Normal</span>
+        }
+    </button>
 </div>
 @code {
     private bool GraphicImage = true;

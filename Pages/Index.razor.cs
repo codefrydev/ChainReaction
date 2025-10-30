@@ -3,13 +3,12 @@ using ChainReaction.Components;
 using ChainReaction.Model;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using MudBlazor;
 namespace ChainReaction.Pages;
 
 public partial class Index
 {
     [Inject] protected IJSRuntime JSRuntime { get; set; } = null!;
-    [Inject] public IDialogService DialogService { get; set; } = null!;
+    [Inject] public NavigationManager NavigationManager { get; set; } = null!;
 
     bool busy = false;
     int count = 0;
@@ -24,6 +23,7 @@ public partial class Index
     bool allPlayerPlayed = false;
     readonly HashSet<string> allPlayerPlayedList = [];
     readonly Dictionary<string, (DateTime Date, string color, int Period)> lostPlayers = [];
+    public Dictionary<string, (DateTime Date, string color, int Period)> ScoreLeaderWithTime => lostPlayers;
     bool dialogShown = false;
     public async Task UserClicked(Cell cell)
     {
@@ -140,21 +140,6 @@ public partial class Index
         lostPlayers.TryAdd(livePlayerList[0].Name,
             (DateTime.Now, livePlayerList[0].HoverColorFormed(), lostPeriodForPlayerIndexingInLeaderboard));
         var list = lostPlayers.OrderBy(x => x.Value).Select(x => x.Key).ToList();
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            DisableBackdropClick = true,
-            FullWidth = true,
-            NoHeader = true,
-            FullScreen = true,
-        };
-        var parameters = new DialogParameters<GameOver>
-        {
-            {
-                x=>x.ScoreLeaderWithTime,lostPlayers
-            }
-        };
-        _ = DialogService.ShowAsync<GameOver>("Configuration", parameters, options);
     }
     #endregion
     public async Task Increase(Cell cell)
@@ -192,6 +177,11 @@ public partial class Index
             #endregion
         }
     } 
+    public void GoHome()
+    {
+        dialogShown = false;
+        NavigationManager.NavigateTo("");
+    }
     private async Task Feedback()
     {
         await JSRuntime.InvokeVoidAsync("blazorFunctions.BhukampLao",Config.Kampan,Config.Dhwani);

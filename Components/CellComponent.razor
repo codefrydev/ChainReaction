@@ -1,5 +1,6 @@
-﻿<div class="container"
-     style="background:@($"{color}");@("width:{Config.CellHeight};height:{Config.CellHeight};");border-color:@($"{Config.CurrentUserColor}"); cursor:pointer "
+﻿<div class="game-cell"
+     style="@($"width:{Config.CellHeight}px;height:{Config.CellHeight}px;border:3px solid {Config.CurrentUserColor};{(string.IsNullOrEmpty(color) ? "" : $"background:{color};")}")"
+     @onclick="OnClick"
      @onmouseenter="OnEnter" @onmouseleave="OnExit">
     @if (Config.Icon)
     {
@@ -62,19 +63,8 @@
 
 @code {
     [Parameter] public Cell cell { get; set; } = new();
-    private string color = "white";
-    void OnEnter() => color = Config.HoverColor;
+    [Parameter] public EventCallback OnClick { get; set; }
+    private string color = "transparent";
+    void OnEnter() => color = "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)";
     void OnExit() => color = "transparent";
 }
-
-<style>
-    .container {
-        position: relative;
-        border-width: 1px;
-    }
-
-    .center-text {
-        position: absolute;
-        font-size: 24px;
-    }
-</style>

@@ -2,95 +2,144 @@
 
 <SlidingBubble/> 
 <HelpButton/>
-<div class="container" style="background-color:transparent">
-    <div class="content" style="background-color:transparent">
-        <MudPaper MaxWidth="720px" Elevation="0" Style="background-color:transparent">
-            <MudPaper Class="d-flex flex-column flex-grow-1 gap-4" Elevation="0" Style="background-color:transparent">
-                <MudList Style="background-color:#ffffff4d;border:4px solid #ffffffb3; border-radius:30px;box-shadow:inset">
-                    <MudListItem>
-                        <MudText Typo="Typo.h1">
-                            <strong>
-                                Chain Reaction
-                            </strong>
-                        </MudText>
-                    </MudListItem>
-                    <MudListItem>
-                        <MudRadioGroup @bind-Value="@Config.NumberOfPlayer" T="int">
-                            <MudRadio Value="2" Color="Color.Secondary" Size="Size.Large">2 Player</MudRadio>
-                            <MudRadio Value="3" Color="Color.Secondary" Size="Size.Large">3 Player</MudRadio>
-                            <MudRadio Value="4" Color="Color.Secondary" Size="Size.Large">4 Player</MudRadio>
-                            <MudRadio Value="5" Color="Color.Secondary" Size="Size.Large">5 Player</MudRadio>
-                            <MudRadio Value="6" Color="Color.Secondary" Size="Size.Large">6 Player</MudRadio>
-                        </MudRadioGroup>
-                        @* <MudSelect T="int"
-                                   Label="Number of Player"
-                                   Variant="Variant.Outlined"
-                                   AnchorOrigin="Origin.BottomCenter"
-                                   @bind-Value="@Config.NumberOfPlayer"
-                                   Class="custom-label-color">
-                            <MudSelectItem T="int" Value="2" />
-                            <MudSelectItem T="int" Value="3" />
-                            <MudSelectItem T="int" Value="4" />
-                            <MudSelectItem T="int" Value="5" />
-                            <MudSelectItem T="int" Value="6" />
-                        </MudSelect> *@
-                    </MudListItem>
-                    <MudListItem>
-                        <MudExpansionPanel Class="custom-expansion" Text="Optional" Style="border-radius:8px">
-                            <MudCheckBox @bind-Value="@Config.Kampan" Label="Vibrate" />
-                            <MudCheckBox @bind-Value="@Config.Dhwani" Label="Sound" />
-                            <MudCheckBox @bind-Value="@Config.IsCusTomDimention" Label="Check for Custom Dimention" />
-                            @if(Config.IsCusTomDimention)
-                            {
-                                <MudNumericField HideSpinButtons="true" 
-                                    @bind-Value="Config.Rows" Label="Number of rows"
-                                    Variant="Variant.Outlined" Step="10" Min="4" Max="100" />
-                                <MudNumericField HideSpinButtons="true"
-                                    @bind-Value="Config.Column" Label="Number of columns"
-                                    Variant="Variant.Outlined" Step="10" Min="4" Max="100"/>
-                            }
-                        </MudExpansionPanel>
-                    </MudListItem>
-                    <MudListItem> 
+<div class="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-[800px] my-8">
+        <div class="flex flex-col gap-6 backdrop-blur-xl bg-gradient-to-br from-amber-100/90 via-yellow-100/90 to-orange-100/90 rounded-3xl shadow-2xl ring-4 ring-amber-800/30 p-6 md:p-8 transition-all duration-300 hover:shadow-[0_20px_70px_rgba(139,90,43,0.4)] animate-scale-in border-4 border-amber-700/50">
+            
+            <!-- Cartoon-themed Header -->
+            <div class="text-center space-y-3">
+                <div class="flex items-center justify-center gap-4 mb-2 animate-bounce-cartoon">
+                    <span class="text-6xl md:text-7xl animate-wiggle">🐱</span>
+                    <span class="text-6xl md:text-7xl">💥</span>
+                    <span class="text-6xl md:text-7xl animate-wiggle" style="animation-delay: 0.3s">🐭</span>
+                </div>
+                <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight animate-slide-up cartoon-title bg-gradient-to-r from-blue-600 via-amber-600 to-orange-600 bg-clip-text text-transparent">
+                    Chain Reaction
+                </h1>
+                <p class="text-amber-900 text-base md:text-lg font-bold px-4" style="font-family: 'Comic Sans MS', cursive;">
+                    🧀 Classic Cartoon-Style Strategic Game! 🧀
+                </p>
+            </div>
 
-                        <MudPaper Style="background-color: transparent; display: flex; justify-content: center; align-items: center;" Elevation="0"> 
-                            <MudButton Variant="Variant.Filled"
-                                       Color="Color.Info"
-                                       Size="Size.Large"
-                                       OnClick="StartGame">
-                            Play with @Config.NumberOfPlayer Player
-                            </MudButton>
-                        </MudPaper>
-                    </MudListItem> 
-                </MudList>
+            <!-- Number of Players Section - Cartoon Style -->
+            <div class="space-y-3 bg-white/60 rounded-2xl p-4 border-3 border-amber-600/30 shadow-cartoon">
+                <label class="block text-base md:text-lg font-black text-amber-900 text-cartoon" style="font-family: 'Comic Sans MS', cursive;">
+                    🎮 Number of Players
+                </label>
+                <div class="flex flex-wrap gap-2 md:gap-3">
+                    @foreach (var playerCount in new[] { 2, 3, 4, 5, 6 })
+                    {
+                        <label class="@GetPlayerButtonClass(playerCount)">
+                            <input type="radio" 
+                                   name="playerCount" 
+                                   value="@playerCount" 
+                                   checked="@(Config.NumberOfPlayer == playerCount)"
+                                   @onchange="() => SelectPlayerCount(playerCount)"
+                                   class="sr-only" />
+                            <span class="font-black text-sm md:text-base">@playerCount</span>
+                        </label>
+                    }
+                </div>
+            </div>
 
-            </MudPaper>
-        </MudPaper>
+            <!-- Optional Settings - Cartoon Style -->
+            <details class="group bg-gradient-to-br from-white/70 to-yellow-50/70 backdrop-blur rounded-2xl p-4 md:p-5 border-3 border-amber-600/40 hover:border-amber-700/60 transition-all shadow-cartoon">
+                <summary class="cursor-pointer font-bold text-amber-900 flex items-center justify-between select-none text-cartoon">
+                    <span class="flex items-center gap-2 text-sm md:text-base" style="font-family: 'Comic Sans MS', cursive;">
+                        <svg class="w-5 h-5 md:w-6 md:h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        ⚙️ Advanced Settings
+                    </span>
+                    <svg class="w-5 h-5 md:w-6 md:h-6 text-amber-700 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </summary>
+                <div class="mt-4 md:mt-5 space-y-3">
+                    <label class="flex items-center gap-3 p-3 rounded-xl bg-yellow-50/70 hover:bg-yellow-100/90 border-2 border-amber-500/30 hover:border-amber-600/50 transition-all cursor-pointer group/item shadow-sm hover:shadow-md transform hover:scale-102">
+                        <input type="checkbox" @bind="Config.Kampan" class="h-5 w-5 md:h-6 md:w-6 rounded-lg border-2 border-amber-600 text-yellow-500 focus:ring-yellow-400 cursor-pointer" />
+                        <div class="flex-1">
+                            <div class="font-bold text-sm md:text-base text-amber-900 group-hover/item:text-amber-700 transition-colors" style="font-family: 'Comic Sans MS', cursive;">📳 Vibration</div>
+                            <div class="text-xs md:text-sm text-amber-700">Feel the cartoon action!</div>
+                        </div>
+                    </label>
+                    
+                    <label class="flex items-center gap-3 p-3 rounded-xl bg-yellow-50/70 hover:bg-yellow-100/90 border-2 border-amber-500/30 hover:border-amber-600/50 transition-all cursor-pointer group/item shadow-sm hover:shadow-md transform hover:scale-102">
+                        <input type="checkbox" @bind="Config.Dhwani" class="h-5 w-5 md:h-6 md:w-6 rounded-lg border-2 border-amber-600 text-yellow-500 focus:ring-yellow-400 cursor-pointer" />
+                        <div class="flex-1">
+                            <div class="font-bold text-sm md:text-base text-amber-900 group-hover/item:text-amber-700 transition-colors" style="font-family: 'Comic Sans MS', cursive;">🔊 Sound Effects</div>
+                            <div class="text-xs md:text-sm text-amber-700">Hear the chase come alive!</div>
+                        </div>
+                    </label>
+                    
+                    <label class="flex items-center gap-3 p-3 rounded-xl bg-yellow-50/70 hover:bg-yellow-100/90 border-2 border-amber-500/30 hover:border-amber-600/50 transition-all cursor-pointer group/item shadow-sm hover:shadow-md transform hover:scale-102">
+                        <input type="checkbox" @bind="Config.IsCusTomDimention" class="h-5 w-5 md:h-6 md:w-6 rounded-lg border-2 border-amber-600 text-yellow-500 focus:ring-yellow-400 cursor-pointer" />
+                        <div class="flex-1">
+                            <div class="font-bold text-sm md:text-base text-amber-900 group-hover/item:text-amber-700 transition-colors" style="font-family: 'Comic Sans MS', cursive;">📐 Custom Dimensions</div>
+                            <div class="text-xs md:text-sm text-amber-700">Bigger playground, more chaos!</div>
+                        </div>
+                    </label>
+
+                    @if(Config.IsCusTomDimention)
+                    {
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 pt-2 animate-slide-up">
+                            <div class="space-y-2">
+                                <label class="block text-xs md:text-sm font-black text-amber-900" style="font-family: 'Comic Sans MS', cursive;">↕️ Rows</label>
+                                <input type="number" @bind="Config.Rows" min="4" max="100" step="1" 
+                                    class="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl border-3 border-amber-600 bg-yellow-50 text-amber-900 font-bold text-sm md:text-base shadow-sm focus:outline-none focus:ring-4 focus:ring-yellow-400 focus:border-yellow-500 transition-all" />
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs md:text-sm font-black text-amber-900" style="font-family: 'Comic Sans MS', cursive;">↔️ Columns</label>
+                                <input type="number" @bind="Config.Column" min="4" max="100" step="1" 
+                                    class="w-full px-3 md:px-4 py-2 md:py-2.5 rounded-xl border-3 border-amber-600 bg-yellow-50 text-amber-900 font-bold text-sm md:text-base shadow-sm focus:outline-none focus:ring-4 focus:ring-yellow-400 focus:border-yellow-500 transition-all" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </details>
+
+            <!-- Play Button - Cartoon Style with Cheese Theme -->
+            <div class="flex justify-center pt-2 md:pt-4">
+                <button class="cartoon-btn group relative px-6 md:px-10 py-4 md:py-5 rounded-3xl bg-gradient-to-br from-yellow-400 via-amber-400 to-orange-500 text-amber-900 text-lg md:text-2xl font-black shadow-2xl hover:shadow-[0_15px_40px_rgba(255,215,0,0.6)] transition-all duration-300 transform hover:-translate-y-2 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-yellow-400/50 active:scale-95 border-4 border-amber-700 animate-bounce-cartoon" @onclick="StartGame" style="font-family: 'Chewy', cursive;">
+                    <span class="relative z-10 flex items-center gap-2 md:gap-3 text-cartoon">
+                        <svg class="w-6 h-6 md:w-8 md:h-8 transition-transform group-hover:scale-125 group-hover:rotate-12" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+                        </svg>
+                        <span class="hidden sm:inline">🎮 Start the Chase! 🧀</span>
+                        <span class="sm:hidden">Start! 🎮</span>
+                    </span>
+                    <div class="absolute inset-0 rounded-3xl bg-gradient-to-r from-yellow-300 to-orange-400 opacity-0 group-hover:opacity-100 blur-xl transition-opacity"></div>
+                </button>
+            </div>
+            
+            <!-- Footer Info -->
+            <div class="text-center text-xs md:text-sm text-amber-800/70 font-semibold pt-2" style="font-family: 'Comic Sans MS', cursive;">
+                <p>Playing with <span class="font-black text-amber-900 text-base md:text-lg">@Config.NumberOfPlayer</span> Player@(Config.NumberOfPlayer > 1 ? "s" : "")</p>
+            </div>
+        </div>
     </div>
 </div>
 
- 
-<style>
-    .container {
-        /* This ensures the container takes up the entire viewport */
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        /* Center content vertically */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: #e5e9f4
+@code {
+    private void SelectPlayerCount(int count)
+    {
+        Config.NumberOfPlayer = count;
+        StateHasChanged();
     }
 
-    .custom-label-color .mud-input-label {
-        background-color: #e5e9f4 !important;
-    }  
-    .custom-expansion {
-        background-color: #ffffff4d;
-        border-radius:4px;
+    private string GetPlayerButtonClass(int playerCount)
+    {
+        var baseClass = "flex items-center justify-center min-w-[45px] md:min-w-[60px] px-3 md:px-4 py-2 md:py-3 rounded-xl border-3 cursor-pointer transition-all duration-200 font-black shadow-md hover:shadow-xl transform hover:scale-110";
+        var isSelected = Config.NumberOfPlayer == playerCount;
+        
+        if (isSelected)
+        {
+            return $"{baseClass} border-amber-700 bg-gradient-to-br from-yellow-400 to-amber-500 shadow-cartoon text-amber-900 scale-105";
+        }
+        else
+        {
+            return $"{baseClass} border-amber-600/40 bg-white/90 text-amber-800 hover:bg-yellow-50 hover:border-amber-600";
+        }
     }
-
-</style>
+}

@@ -38,45 +38,45 @@ namespace ChainReaction.Model
         [
             new Player()
             {
-                Name = "Player Red",
+                Name = "Player Blue Cat",
+                RColor = 70,
+                GColor = 130,
+                BColor = 180
+            },
+            new Player()
+            {
+                Name = "Player Brown Mouse",
+                RColor = 205,
+                GColor = 133,
+                BColor = 63
+            },
+            new Player()
+            {
+                Name = "Player Orange",
                 RColor = 255,
-                GColor = 0,
+                GColor = 140,
+                BColor = 0
+            },
+            new Player()
+            {
+                Name = "Player Yellow Cheese",
+                RColor = 255,
+                GColor = 215,
                 BColor = 0
             },
             new Player()
             {
                 Name = "Player Green",
-                RColor = 0,
-                GColor = 255,
-                BColor = 0
+                RColor = 60,
+                GColor = 179,
+                BColor = 113
             },
             new Player()
             {
-                Name = "Player Black",
-                RColor = 0,
-                GColor = 0,
-                BColor = 0
-            },
-            new Player()
-            {
-                Name = "Player Blue",
-                RColor = 0,
-                GColor = 0,
-                BColor = 255
-            },
-            new Player()
-            {
-                Name = "Player Sky",
-                RColor = 0,
-                GColor = 255,
-                BColor = 255
-            },
-            new Player()
-            {
-                Name = "Player Aqua blue",
-                RColor = 109,
-                GColor = 197,
-                BColor = 209
+                Name = "Player Purple",
+                RColor = 147,
+                GColor = 112,
+                BColor = 219
             }
 
         ];
