@@ -1,0 +1,240 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    @apply min-h-screen antialiased;
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive, sans-serif;
+  }
+}
+
+@layer components {
+  /* Tom & Jerry Cartoon Button Styles */
+  .btn-primary {
+    @apply px-6 py-3 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-400 to-amber-500 text-slate-800 font-bold shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-yellow-400/50 active:scale-95;
+    border: 3px solid #8B5A2B;
+    text-shadow: 1px 1px 0px rgba(255,255,255,0.5);
+  }
+  
+  .btn-secondary {
+    @apply px-6 py-3 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400/50 active:scale-95;
+    border: 3px solid #2C5F7F;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  }
+  
+  .btn-icon {
+    @apply h-12 w-12 flex items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:rotate-12 active:scale-95;
+    border: 3px solid #8B0000;
+  }
+
+  /* Cartoon Radio Button Styles */
+  input[type="radio"] {
+    @apply h-5 w-5 text-yellow-500 border-amber-600 focus:ring-yellow-400 cursor-pointer;
+  }
+  
+  /* Cartoon Checkbox Styles */
+  input[type="checkbox"] {
+    @apply h-6 w-6 rounded-lg border-2 border-amber-600 text-yellow-500 focus:ring-yellow-400 cursor-pointer;
+  }
+
+  /* Cartoon Card Styles */
+  .card {
+    @apply backdrop-blur-md bg-amber-50/90 rounded-3xl shadow-xl ring-4 ring-amber-800/30 transition-all duration-300 hover:shadow-2xl;
+    border: 4px solid #8B5A2B;
+  }
+  
+  .card-compact {
+    @apply backdrop-blur-md bg-yellow-50/80 rounded-2xl shadow-md ring-2 ring-amber-700/20 transition-shadow duration-300 hover:shadow-lg;
+    border: 3px solid #D4A574;
+  }
+
+  /* Input Styles - Cartoon Theme */
+  .input {
+    @apply w-full px-4 py-3 rounded-xl border-3 border-amber-600 bg-yellow-50 text-slate-800 font-semibold shadow-sm focus:outline-none focus:ring-4 focus:ring-yellow-400 focus:border-yellow-500 transition-all duration-200;
+  }
+  
+  /* Modal Overlay - Tom & Jerry */
+  .modal-overlay {
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in;
+  }
+  
+  .modal-content {
+    @apply relative bg-amber-50/95 backdrop-blur-md rounded-3xl shadow-2xl ring-4 ring-amber-800/40 max-h-[90vh] overflow-auto animate-scale-in;
+    border: 5px solid #8B5A2B;
+  }
+
+  /* Leaderboard Cartoon Style */
+  .leaderboard-modern {
+    @apply bg-gradient-to-br from-amber-700 via-amber-800 to-amber-900 rounded-3xl overflow-hidden shadow-2xl;
+    border: 5px solid #5C3A1E;
+  }
+  
+  .leaderboard-item {
+    @apply flex items-center px-6 py-4 border-b-2 border-yellow-600/30 transition-all duration-300 hover:bg-yellow-500/20 backdrop-blur;
+  }
+
+  /* Game Cell Styles - Cheese Board Theme */
+  .game-cell {
+    @apply relative transition-all duration-200 cursor-pointer;
+    background: linear-gradient(135deg, #FFF8DC 0%, #FFEAA7 100%);
+    box-sizing: border-box;
+    border: 2px solid #D4A574 !important;
+  }
+  
+  .game-cell:hover {
+    @apply scale-110;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 193, 7, 0.5);
+    z-index: 10;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  }
+
+  /* Cartoon Button Effects */
+  .cartoon-btn {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .cartoon-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    transform: scale(0);
+    transition: transform 0.5s;
+  }
+  
+  .cartoon-btn:hover::before {
+    transform: scale(1);
+  }
+}
+
+@layer utilities {
+  .text-gradient-tom {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-blue-700 to-slate-700;
+  }
+  
+  .text-gradient-jerry {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-600 via-yellow-600 to-orange-600;
+  }
+  
+  .text-cartoon {
+    text-shadow: 3px 3px 0px rgba(0,0,0,0.2), -1px -1px 0px rgba(255,255,255,0.5);
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+  
+  .bg-wood {
+    background: linear-gradient(180deg, #8B5A2B 0%, #6B4423 50%, #4A2F1A 100%);
+  }
+  
+  .bg-cheese {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 25%, #FFD700 50%, #FFA500 75%, #FFD700 100%);
+    background-size: 200% 200%;
+    animation: cheese-glow 3s ease infinite;
+  }
+  
+  .bg-cartoon-sky {
+    background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 50%, #F0F8FF 100%);
+  }
+  
+  .shadow-cartoon {
+    box-shadow: 5px 5px 0px rgba(0,0,0,0.3), -2px -2px 0px rgba(255,255,255,0.3);
+  }
+  
+  .shadow-cartoon-lg {
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.3), -3px -3px 0px rgba(255,255,255,0.3);
+  }
+}
+
+/* Tom & Jerry Themed Animations */
+@keyframes cheese-glow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes bounce-cartoon {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-15px) scale(1.05); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+/* Loading Animation */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Custom scrollbar - Cartoon Theme */
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background: linear-gradient(90deg, #8B5A2B 0%, #6B4423 100%);
+  border-radius: 10px;
+  border: 2px solid #5C3A1E;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+  border-radius: 10px;
+  border: 2px solid #D4A574;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #FFA500 0%, #FF8C00 100%);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, #FF8C00 0%, #FF6347 100%);
+}
+
+/* Cartoon Text Effects */
+.cartoon-title {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive;
+  font-weight: 900;
+  font-size: 3rem;
+  text-shadow: 4px 4px 0px rgba(0,0,0,0.3),
+               -2px -2px 0px rgba(255,255,255,0.5),
+               0 0 10px rgba(255,215,0,0.5);
+  letter-spacing: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .cartoon-title {
+    font-size: 2rem;
+  }
+  
+  .game-cell {
+    border-width: 1px !important;
+  }
+}
+

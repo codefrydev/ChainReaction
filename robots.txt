@@ -1,0 +1,25 @@
+# robots.txt for Chain Reaction Game
+# https://codefrydev.in/ChainReaction/
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://codefrydev.in/ChainReaction/sitemap.xml
+
+# Crawl-delay for all bots
+Crawl-delay: 1
+
+# Disallow specific paths if needed
+Disallow: /bin/
+Disallow: /obj/
+Disallow: /_framework/
+
+# Allow important assets
+Allow: /wwwroot/
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.gif$
+Allow: /*.mp3$
+Allow: /*.ico$
+

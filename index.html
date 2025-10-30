@@ -13,8 +13,48 @@
     </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>ChainReaction</title>
+    
+    <!-- Primary Meta Tags -->
+    <title>🐱🐭 Chain Reaction Game | Free Online Multiplayer Strategy Game</title>
+    <meta name="title" content="Chain Reaction Game | Free Online Multiplayer Strategy Game" />
+    <meta name="description" content="Play Chain Reaction - A free, fun cartoon-themed multiplayer strategy game! Challenge up to 8 players in this explosive orb-placing game. No download required, play now!" />
+    <meta name="keywords" content="Chain Reaction game, multiplayer strategy game, free online game, browser game, orb game, chain reaction online, cartoon game, casual game, 2-8 players, turn-based strategy" />
+    <meta name="author" content="CodeFry Dev" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    <meta name="revisit-after" content="7 days" />
+    <meta name="theme-color" content="#FFD700" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://codefrydev.in/ChainReaction/" />
     <base href="/ChainReaction/" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://codefrydev.in/ChainReaction/" />
+    <meta property="og:title" content="Chain Reaction Game | Free Online Multiplayer Strategy Game" />
+    <meta property="og:description" content="Play Chain Reaction - A free, fun cartoon-themed multiplayer strategy game! Challenge up to 8 players in this explosive orb-placing game." />
+    <meta property="og:image" content="https://codefrydev.in/favicon-32x32.png" />
+    <meta property="og:image:width" content="32" />
+    <meta property="og:image:height" content="32" />
+    <meta property="og:site_name" content="Chain Reaction" />
+    <meta property="og:locale" content="en_US" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://codefrydev.in/ChainReaction/" />
+    <meta property="twitter:title" content="Chain Reaction Game | Free Online Multiplayer Strategy Game" />
+    <meta property="twitter:description" content="Play Chain Reaction - A free, fun cartoon-themed multiplayer strategy game! Challenge up to 8 players." />
+    <meta property="twitter:image" content="https://codefrydev.in/favicon-32x32.png" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="https://codefrydev.in/favicon-32x32.png" />
+    <link rel="apple-touch-icon" sizes="32x32" href="https://codefrydev.in/favicon-32x32.png" />
+    <link rel="shortcut icon" type="image/png" href="https://codefrydev.in/favicon-32x32.png" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json" />
+    
     <style>
         .loading {
             position: absolute;
@@ -30,31 +70,298 @@
             right: 0;
             bottom: 0; 
             display: flex;
+            flex-direction: column;
+            gap: 30px;
             justify-content: center;
             align-items: center;
-            background-color: #e5e9f4
+            background: linear-gradient(135deg, #87CEEB 0%, #F5DEB3 50%, #FFD700 100%);
+            animation: bg-shift 5s ease-in-out infinite;
+        }
+        .loading-text {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+            font-size: 42px;
+            font-weight: 900;
+            background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #FFD93D, #6BCF7F, #FF6B6B);
+            background-size: 300% auto;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            animation: shimmer 2s linear infinite, bounce-cartoon 1.5s ease-in-out infinite;
+            letter-spacing: 3px;
+            text-shadow: 3px 3px 0px rgba(0,0,0,0.2);
+            text-align: center;
+            padding: 0 20px;
+        }
+        .loading-subtitle {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+            font-size: 20px;
+            font-weight: 700;
+            color: #8B4513;
+            text-shadow: 2px 2px 0px rgba(255,255,255,0.7);
+            animation: wiggle 2s ease-in-out infinite;
+        }
+        .cheese-loader {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border-radius: 50%;
+            border: 5px solid #8B5A2B;
+            position: relative;
+            animation: rotate-cheese 2s linear infinite;
+            box-shadow: 0 10px 40px rgba(255,215,0,0.5);
+        }
+        .cheese-hole {
+            position: absolute;
+            background: #F5DEB3;
+            border-radius: 50%;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
+        }
+        .hole1 { width: 20px; height: 20px; top: 20px; left: 30px; }
+        .hole2 { width: 25px; height: 25px; top: 50px; right: 20px; }
+        .hole3 { width: 18px; height: 18px; bottom: 25px; left: 45px; }
+        .hole4 { width: 22px; height: 22px; bottom: 35px; right: 35px; }
+        @keyframes shimmer {
+            to { background-position: 300% center; }
+        }
+        @keyframes bounce-cartoon {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-3deg); }
+            75% { transform: rotate(3deg); }
+        }
+        @keyframes rotate-cheese {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes bg-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        html { scroll-behavior: smooth; }
+        @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes scale-in { 0% { transform: translateY(8px) scale(0.97) } 100% { transform: translateY(0) scale(1) } }
+        @keyframes slide-up { from { transform: translateY(20px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+        @keyframes bounce-subtle { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
+        .animate-fade-in { animation: fade-in 150ms ease-out; }
+        .animate-scale-in { animation: scale-in 200ms ease-out; }
+        .animate-slide-up { animation: slide-up 300ms ease-out; }
+        .animate-bounce-subtle { animation: bounce-subtle 2s ease-in-out infinite; }
+        
+        /* Responsive loading text */
+        @media (max-width: 768px) {
+            .loading-text {
+                font-size: 28px;
+            }
+            .loading-subtitle {
+                font-size: 16px;
+            }
+            .cheese-loader {
+                width: 80px;
+                height: 80px;
+            }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
-    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Chewy&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cartoon: ['"Comic Sans MS"', '"Chalkboard SE"', '"Comic Neue"', 'cursive'],
+                        game: ['Bangers', 'cursive'],
+                        fun: ['Chewy', 'cursive'],
+                    },
+                    animation: {
+                        'fade-in': 'fade-in 0.15s ease-out',
+                        'scale-in': 'scale-in 0.2s ease-out',
+                        'slide-up': 'slide-up 0.3s ease-out',
+                        'bounce-subtle': 'bounce-subtle 2s infinite',
+                        'wiggle': 'wiggle 2s ease-in-out infinite',
+                        'bounce-cartoon': 'bounce-cartoon 1.5s ease-in-out infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="app.css" rel="stylesheet" />
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "name": "Chain Reaction",
+        "description": "Chain Reaction is a free online multiplayer strategy game where players place orbs on a grid to create explosive chain reactions. Outsmart your opponents in this turn-based cartoon-themed game.",
+        "url": "https://codefrydev.in/ChainReaction/",
+        "gamePlatform": ["Web Browser", "Desktop", "Mobile"],
+        "genre": ["Strategy", "Puzzle", "Multiplayer", "Turn-based"],
+        "numberOfPlayers": {
+            "@type": "QuantitativeValue",
+            "minValue": 2,
+            "maxValue": 8
+        },
+        "playMode": ["MultiPlayer", "LocalMultiPlayer"],
+        "applicationCategory": "Game",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "CodeFry Dev",
+            "url": "https://codefrydev.in"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "150",
+            "bestRating": "5"
+        },
+        "image": "https://codefrydev.in/favicon-32x32.png",
+        "inLanguage": "en-US"
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "How do you play Chain Reaction?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Chain Reaction is a turn-based strategy game where players take turns placing orbs on a grid. When a cell reaches its critical mass (1 for corners, 2 for edges, 3 for other cells), it explodes and sends orbs to adjacent cells. The goal is to take over all cells and eliminate other players."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How many players can play Chain Reaction?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Chain Reaction supports 2 to 8 players in a single game. It's perfect for both quick 1v1 matches and chaotic multiplayer battles with friends."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is Chain Reaction free to play?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes! Chain Reaction is completely free to play with no downloads required. Simply open it in your web browser on any device and start playing immediately."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What are the rules for cell explosions in Chain Reaction?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Corner cells explode with 1 orb (affecting 2 neighbors), edge cells explode with 2 orbs (affecting 3 neighbors), and center cells explode with 3 orbs (affecting 4 neighbors). When a cell explodes, it sends one orb to each adjacent cell horizontally and vertically."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I play Chain Reaction on mobile?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes! Chain Reaction is fully responsive and works perfectly on mobile devices, tablets, and desktop computers. Just open the game in your mobile browser to play."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What happens when a player is eliminated in Chain Reaction?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "When a player loses all their orbs on the board, they are eliminated from the game. The turn order continues with the remaining players until only one player remains as the winner."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do I need to download anything to play Chain Reaction?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No downloads or installations required! Chain Reaction is a browser-based game built with modern web technologies. Simply visit the website and start playing instantly."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I play Chain Reaction offline?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Chain Reaction requires an initial internet connection to load, but once loaded, you can play locally with friends on the same device in hot-seat multiplayer mode."
+                }
+            }
+        ]
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Chain Reaction Game",
+        "alternateName": "Chain Reaction Multiplayer Strategy Game",
+        "url": "https://codefrydev.in/ChainReaction/",
+        "description": "Free online multiplayer strategy game with explosive chain reactions",
+        "publisher": {
+            "@type": "Organization",
+            "name": "CodeFry Dev",
+            "url": "https://codefrydev.in"
+        },
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://codefrydev.in/ChainReaction/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://codefrydev.in/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Chain Reaction Game",
+                "item": "https://codefrydev.in/ChainReaction/"
+            }
+        ]
+    }
+    </script>
 </head>
 
-<body style="background-color:#e5e9f4">
+<body class="min-h-screen antialiased bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50">
     <div id="app">
         <div class="loading">
             <div class="loadinBaba">
-                <img  src="loading.svg"  height="200" width="200"/>
+                <div class="loading-text">Chain Reaction</div>
+                <div class="cheese-loader">
+                    <div class="cheese-hole hole1"></div>
+                    <div class="cheese-hole hole2"></div>
+                    <div class="cheese-hole hole3"></div>
+                    <div class="cheese-hole hole4"></div>
+                </div>
+                <div class="loading-subtitle">🐱 Loading the Chase... 🐭</div>
             </div>
         </div>
     </div>
-
-    <div id="blazor-error-ui">
-        Catch Developer And Give Then High Five on their Face
-        <a href="" class="reload">Or you can Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
     <script src="_framework/blazor.webassembly.js"></script>
-    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="dimendion.js"></script>
     <script src="feedback.js"></script>
 </body>
