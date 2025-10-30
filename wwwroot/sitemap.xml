@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+    
+    <!-- Main Game Page -->
+    <url>
+        <loc>https://codefrydev.in/ChainReaction/</loc>
+        <lastmod>2025-10-30</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+        <image:image>
+            <image:loc>https://codefrydev.in/favicon-32x32.png</image:loc>
+            <image:title>Chain Reaction Game Icon</image:title>
+        </image:image>
+        <image:image>
+            <image:loc>https://codefrydev.in/ChainReaction/CornerRule.gif</image:loc>
+            <image:title>Chain Reaction Corner Cell Rules</image:title>
+        </image:image>
+        <image:image>
+            <image:loc>https://codefrydev.in/ChainReaction/EdgeRule.gif</image:loc>
+            <image:title>Chain Reaction Edge Cell Rules</image:title>
+        </image:image>
+        <image:image>
+            <image:loc>https://codefrydev.in/ChainReaction/RestRule.gif</image:loc>
+            <image:title>Chain Reaction Center Cell Rules</image:title>
+        </image:image>
+    </url>
+    
+</urlset>
+
