@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 namespace ChainReaction.Pages;
 
-public partial class Index
+public partial class Index : IAsyncDisposable
 {
     [Inject] protected IJSRuntime JSRuntime { get; set; } = null!;
     [Inject] public NavigationManager NavigationManager { get; set; } = null!;
@@ -15,7 +15,11 @@ public partial class Index
     int column = 0;
     int row = 0;
     WindowSize? windowSize;
-    readonly int gridDimentions = 64;
+    DotNetObjectReference<Index>? dotNetRef;
+    const int MinCellSize = 28;
+    const int MaxCellSize = 64;
+    const int HorizontalPadding = 48;
+    const int VerticalPadding = 80;
     List<List<Cell>> gridOfCells = [];
     List<Player> livePlayerList = [];
     // Scoring handeling
@@ -25,6 +29,7 @@ public partial class Index
     readonly Dictionary<string, (DateTime Date, string color, int Period)> lostPlayers = [];
     public Dictionary<string, (DateTime Date, string color, int Period)> ScoreLeaderWithTime => lostPlayers;
     bool dialogShown = false;
+    bool closingForReplay = false;
     public async Task UserClicked(Cell cell)
     {
 
@@ -182,6 +187,35 @@ public partial class Index
         dialogShown = false;
         NavigationManager.NavigateTo("");
     }
+
+    public void PlayAgain()
+    {
+        closingForReplay = true;
+        dialogShown = false;
+        ResetForNewGame();
+        closingForReplay = false;
+        StateHasChanged();
+    }
+
+    async Task HandleGameOverModalChanged(bool isOpen)
+    {
+        dialogShown = isOpen;
+        if (!isOpen && !closingForReplay)
+        {
+            NavigationManager.NavigateTo("");
+        }
+    }
+
+    void ResetForNewGame()
+    {
+        busy = false;
+        count = 0;
+        lostPeriodForPlayerIndexingInLeaderboard = 0;
+        allPlayerPlayed = false;
+        allPlayerPlayedList.Clear();
+        lostPlayers.Clear();
+        Reset();
+    }
     private async Task Feedback()
     {
         await JSRuntime.InvokeVoidAsync("blazorFunctions.BhukampLao",Config.Kampan,Config.Dhwani);
@@ -191,7 +225,30 @@ public partial class Index
     {
         if (firstRender)
         {
+            dotNetRef = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("chainReactionLayout.register", dotNetRef);
             await GetInnerDimensions();
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnWindowResize()
+    {
+        windowSize = await JSRuntime.InvokeAsync<WindowSize>("getInnerDimensions");
+        Resize();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        dotNetRef?.Dispose();
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("chainReactionLayout.unregister");
+        }
+        catch (JSDisconnectedException)
+        {
+            // Page is unloading.
         }
     }
 
@@ -203,10 +260,55 @@ public partial class Index
 
     void Resize()
     {
-        int extra = windowSize?.Width > 1400 ? 3 : 0;
-        column = (windowSize?.Width / gridDimentions) - extra ?? 10;
-        row = (windowSize?.Height / gridDimentions) - 2 ?? 10;
-        Reset();
+        if (windowSize is null)
+        {
+            return;
+        }
+
+        var availWidth = Math.Max(windowSize.Width - HorizontalPadding, MinCellSize * 4);
+        var availHeight = Math.Max(windowSize.Height - VerticalPadding, MinCellSize * 4);
+
+        int newColumn;
+        int newRow;
+        if (Config.IsCusTomDimention && Config.Rows >= 4 && Config.Rows <= 100 && Config.Column >= 4 && Config.Column <= 100)
+        {
+            newRow = Config.Rows;
+            newColumn = Config.Column;
+        }
+        else
+        {
+            int extra = windowSize.Width > 1400 ? 3 : 0;
+            newColumn = Math.Max(4, availWidth / MaxCellSize - extra);
+            newRow = Math.Max(4, availHeight / MaxCellSize - 2);
+        }
+
+        var cellByWidth = availWidth / newColumn;
+        var cellByHeight = availHeight / newRow;
+        var fitCellSize = Math.Min(cellByWidth, cellByHeight);
+        int newCellHeight;
+        if (fitCellSize >= MinCellSize)
+        {
+            newCellHeight = Math.Min((int)fitCellSize, MaxCellSize);
+        }
+        else if (Config.IsCusTomDimention)
+        {
+            newCellHeight = Math.Max(20, (int)fitCellSize);
+        }
+        else
+        {
+            newCellHeight = MinCellSize;
+        }
+
+        var gridChanged = gridOfCells.Count == 0 || newColumn != column || newRow != row;
+        column = newColumn;
+        row = newRow;
+        Config.CellHeight = newCellHeight;
+
+        if (gridChanged)
+        {
+            Reset();
+        }
+
         StateHasChanged();
     }
     void Reset()

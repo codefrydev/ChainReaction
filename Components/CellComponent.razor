@@ -1,5 +1,5 @@
-﻿<div class="game-cell"
-     style="@($"width:{Config.CellHeight}px;height:{Config.CellHeight}px;border:3px solid {Config.CurrentUserColor};{(string.IsNullOrEmpty(color) ? "" : $"background:{color};")}")"
+﻿<div class="game-cell shrink-0 box-border"
+     style="@($"width:{Config.CellHeight}px;height:{Config.CellHeight}px;min-width:{Config.CellHeight}px;min-height:{Config.CellHeight}px;border:{(Config.CellHeight < 40 ? 2 : 3)}px solid {Config.CurrentUserColor};{(string.IsNullOrEmpty(color) ? "" : $"background:{color};")}")"
      @onclick="OnClick"
      @onmouseenter="OnEnter" @onmouseleave="OnExit">
     @if (Config.Icon)
