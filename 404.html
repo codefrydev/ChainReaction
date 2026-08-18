@@ -65,8 +65,23 @@
     <link rel="apple-touch-icon" sizes="32x32" href="https://codefrydev.in/favicon-32x32.png" />
     <link rel="shortcut icon" type="image/png" href="https://codefrydev.in/favicon-32x32.png" />
     
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json" />
+    <!-- Prevent Stale Cache & Remove any lingering Service Workers -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                for (let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+        }
+        if ('caches' in window) {
+            caches.keys().then(function (names) {
+                for (let name of names) {
+                    caches.delete(name);
+                }
+            });
+        }
+    </script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
