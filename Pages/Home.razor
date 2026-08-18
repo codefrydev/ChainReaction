@@ -1,354 +1,305 @@
-﻿@page "/"
+@page "/"
+@using ChainReaction.Model
+@using ChainReaction.Components
 
-<SlidingBubble/>
+<SlidingBubble />
+
 @if (showReleasePopup)
 {
-    <Modal IsOpen="showReleasePopup" IsOpenChanged="OnReleasePopupChanged" Title="🎉 New Game Released!" CloseOnBackdrop="true">
+    <Modal IsOpen="showReleasePopup" IsOpenChanged="DismissReleasePopup" Title="🎉 Online Multiplayer is Live!" CloseOnBackdrop="true">
         <ChildContent>
-            <div class="space-y-3 text-center sm:text-left">
-                <p class="text-sm sm:text-base font-bold text-amber-900 leading-relaxed" style="font-family: 'Comic Sans MS', cursive;">
-                    A brand-new <strong>online multiplayer</strong> Chain Reaction is live! Play with friends over the internet — no pass-and-play needed.
+            <div class="space-y-3.5 text-center sm:text-left text-slate-200">
+                <p class="text-sm sm:text-base text-slate-300">
+                    Looking to play with friends across different devices? Check out the new real-time <strong>Online Chain Reaction</strong>!
                 </p>
-                <div class="rounded-xl bg-amber-100/80 border-2 border-amber-400/50 px-3 py-2.5">
-                    <p class="text-xs sm:text-sm font-bold text-amber-800" style="font-family: 'Comic Sans MS', cursive;">
-                        🌍 chainreaction.codefrydev.in
-                    </p>
+                <div class="rounded-2xl bg-indigo-950/70 border border-indigo-500/30 p-3.5 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="text-2xl shrink-0">🌍</span>
+                        <div class="min-w-0 text-left">
+                            <p class="text-sm font-bold text-indigo-300 truncate">chainreaction.codefrydev.in</p>
+                            <p class="text-xs text-slate-400">Multiplayer lobbies & room codes</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </ChildContent>
         <Footer>
-            <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-center">
+            <div class="flex flex-col sm:flex-row gap-2.5 sm:justify-end">
+                <button type="button"
+                        class="px-4 py-2.5 rounded-xl btn-subtle text-slate-300 font-semibold text-sm hover:text-white"
+                        @onclick="DismissReleasePopup">
+                    Stay on Local Mode
+                </button>
                 <a href="https://chainreaction.codefrydev.in/"
                    target="_blank"
                    rel="noopener noreferrer"
-                   class="cartoon-btn inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-br from-yellow-400 via-amber-400 to-orange-500 text-amber-900 font-black shadow-lg hover:shadow-xl transition-all border-2 border-amber-800 text-sm sm:text-base"
-                   style="font-family: 'Chewy', cursive;"
-                   @onclick="DismissReleasePopup">
-                    🌍 Try Online Game
+                   class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold shadow-lg shadow-amber-500/20 text-sm transition-all">
+                    <span>Try Online Game</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
                 </a>
-                <button type="button"
-                        class="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-white/90 text-amber-900 font-bold border-2 border-amber-500/50 hover:bg-amber-50 transition-all text-sm sm:text-base"
-                        style="font-family: 'Comic Sans MS', cursive;"
-                        @onclick="DismissReleasePopup">
-                    Continue Here
-                </button>
             </div>
         </Footer>
     </Modal>
 }
-<main class="home-page min-h-[100dvh] w-full max-w-full overflow-x-hidden flex flex-col">
-    <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden home-page-scroll">
-        <div class="home-page-center min-h-full flex flex-col justify-center px-3 sm:px-4 py-4 sm:py-6">
-            <div class="mx-auto w-full max-w-lg sm:max-w-xl md:max-w-2xl flex flex-col gap-2 sm:gap-3">
-            <HelpButton />
-            <div class="flex flex-col gap-3 sm:gap-4 backdrop-blur-xl bg-gradient-to-br from-amber-100/90 via-yellow-100/90 to-orange-100/90 rounded-2xl sm:rounded-3xl shadow-2xl ring-4 ring-amber-800/30 p-4 sm:p-5 md:p-6 border-4 border-amber-700/50 min-w-0">
-            
-            <!-- Header -->
-            <header class="text-center space-y-1 sm:space-y-2">
-                <div class="flex items-center justify-center gap-2 sm:gap-3">
-                    <span class="text-2xl sm:text-4xl">🐱</span>
-                    <span class="text-2xl sm:text-4xl">💥</span>
-                    <span class="text-2xl sm:text-4xl">🧀</span>
-                </div>
-                <h1 class="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 via-amber-600 to-orange-600 bg-clip-text text-transparent break-words leading-tight">
-                    Chain Reaction
-                </h1>
-                <p class="text-amber-900 text-xs sm:text-sm font-bold" style="font-family: 'Comic Sans MS', cursive;">
-                    Local pass-and-play on one device
-                </p>
-            </header>
 
-            <!-- Online Multiplayer -->
+<main class="relative z-10 min-h-screen min-h-[100dvh] w-full max-w-full flex flex-col justify-between p-3 sm:p-5 md:p-6 overflow-x-hidden safe-bottom safe-top">
+    
+    <!-- Top Header Bar -->
+    <div class="w-full max-w-2xl mx-auto flex items-center justify-between gap-3 shrink-0">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white leading-tight" style="font-family: 'Outfit', sans-serif;">
+                Chain Reaction
+            </h1>
+            <p class="text-xs text-amber-400/90 font-bold tracking-wide">
+                Local Pass & Play · Strategic Multiplayer
+            </p>
+        </div>
+
+        <HelpButton />
+    </div>
+
+    <!-- Main Configuration Card -->
+    <div class="w-full max-w-2xl mx-auto my-2 sm:my-3 flex-1 flex flex-col justify-center min-h-0">
+        <div class="glass-card rounded-3xl p-4 sm:p-5 md:p-6 space-y-4 flex flex-col min-h-0">
+            
+            <!-- Online Game Promotion Banner -->
             <a href="https://chainreaction.codefrydev.in/"
                target="_blank"
                rel="noopener noreferrer"
-               class="flex items-center justify-between gap-3 rounded-xl p-3 sm:p-4 bg-white/75 hover:bg-amber-50/90 text-amber-950 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all border-2 border-amber-600/45 hover:border-amber-700/70 group">
-                <div class="min-w-0 text-left">
-                    <p class="font-black text-sm sm:text-base truncate text-amber-900" style="font-family: 'Comic Sans MS', cursive;">🌍 Play Online Multiplayer</p>
-                    <p class="text-xs text-amber-700/90 truncate">chainreaction.codefrydev.in</p>
+               class="group flex items-center justify-between p-2.5 sm:p-3 rounded-2xl bg-slate-800/40 border border-slate-700/60 hover:border-amber-500/40 shadow-sm transition-all hover:bg-slate-800/70 shrink-0">
+                <div class="flex items-center gap-3 min-w-0">
+                    <span class="text-xl shrink-0 group-hover:scale-110 transition-transform">🌐</span>
+                    <div class="min-w-0">
+                        <p class="text-xs sm:text-sm font-bold text-slate-200 group-hover:text-amber-400 transition-colors flex items-center gap-1.5">
+                            <span>Play Online with Remote Friends</span>
+                            <span class="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 uppercase tracking-wider font-semibold border border-amber-500/30">Web</span>
+                        </p>
+                        <p class="text-[11px] text-slate-400 truncate">Play across phones, tablets & laptops</p>
+                    </div>
                 </div>
-                <svg class="w-5 h-5 shrink-0 text-amber-800 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                <svg class="w-4 h-4 text-slate-400 group-hover:text-amber-400 group-hover:translate-x-1 transition-all shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
                 </svg>
             </a>
 
-            <!-- Number of Players -->
-            <section class="space-y-2 bg-white/60 rounded-xl p-3 sm:p-4 border-3 border-amber-600/30 shadow-cartoon">
-                <label class="block text-sm sm:text-base font-black text-amber-900" style="font-family: 'Comic Sans MS', cursive;">
-                    🎮 Number of Players
-                </label>
-                <div class="flex flex-wrap gap-2">
-                    @foreach (var playerCount in new[] { 2, 3, 4, 5, 6 })
+            <!-- Player Count Picker -->
+            <div class="space-y-1.5 shrink-0">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-1.5">
+                        <span>👥</span>
+                        <span>Number of Players</span>
+                    </label>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        @Config.NumberOfPlayer Players
+                    </span>
+                </div>
+                <div class="grid grid-cols-7 gap-1.5 sm:gap-2">
+                    @foreach (var count in new[] { 2, 3, 4, 5, 6, 7, 8 })
                     {
-                        <label class="@GetPlayerButtonClass(playerCount)">
-                            <input type="radio" 
-                                   name="playerCount" 
-                                   value="@playerCount" 
-                                   checked="@(Config.NumberOfPlayer == playerCount)"
-                                   @onchange="() => SelectPlayerCount(playerCount)"
-                                   class="sr-only" />
-                            <span class="font-black text-sm md:text-base">@playerCount</span>
+                        var isSelected = Config.NumberOfPlayer == count;
+                        <button type="button"
+                                class="py-2 sm:py-2.5 rounded-2xl font-black text-sm sm:text-base transition-all duration-150 flex flex-col items-center justify-center @(isSelected ? "bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/30 scale-105 border-2 border-amber-300" : "bg-slate-800/60 text-slate-300 hover:bg-slate-700/60 border border-slate-700/50")"
+                                @onclick="() => SetPlayerCount(count)">
+                            <span>@count</span>
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex p-1 rounded-2xl bg-slate-950/60 border border-slate-800 text-xs sm:text-sm font-semibold shrink-0">
+                <button type="button"
+                        class="flex-1 py-1.5 rounded-xl transition-all @(activeTab == "players" ? "bg-slate-800 text-amber-400 shadow" : "text-slate-400 hover:text-slate-200")"
+                        @onclick='() => activeTab = "players"'>
+                    🎨 Players (@Config.NumberOfPlayer)
+                </button>
+                <button type="button"
+                        class="flex-1 py-1.5 rounded-xl transition-all @(activeTab == "board" ? "bg-slate-800 text-amber-400 shadow" : "text-slate-400 hover:text-slate-200")"
+                        @onclick='() => activeTab = "board"'>
+                    📐 Grid Arena
+                </button>
+                <button type="button"
+                        class="flex-1 py-1.5 rounded-xl transition-all @(activeTab == "settings" ? "bg-slate-800 text-amber-400 shadow" : "text-slate-400 hover:text-slate-200")"
+                        @onclick='() => activeTab = "settings"'>
+                    ⚙️ Options
+                </button>
+            </div>
+
+            <!-- Tab 1: Players Customization -->
+            @if (activeTab == "players")
+            {
+                <div class="custom-scrollbar max-h-[38vh] sm:max-h-[44vh] overflow-y-auto overscroll-contain pr-1 pt-1 pb-1">
+                    <div class="grid grid-cols-1 @(Config.NumberOfPlayer > 3 ? "sm:grid-cols-2" : "grid-cols-1") gap-2">
+                        @for (int i = 0; i < Config.NumberOfPlayer && i < Config.PlayerList.Count; i++)
+                        {
+                            var index = i;
+                            var player = Config.PlayerList[i];
+                            <div class="p-2.5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <!-- Player Number Badge -->
+                                    <div class="w-7 h-7 rounded-full shadow-md shrink-0 border border-white/40 flex items-center justify-center text-xs font-black"
+                                         style="background: @player.ColorFormed(); color: @player.ContrastTextColor;">
+                                        @(index + 1)
+                                    </div>
+                                    
+                                    <!-- Editable Nickname Input -->
+                                    <div class="flex-1 min-w-0">
+                                        <input type="text"
+                                               @bind="player.Name"
+                                               maxlength="16"
+                                               placeholder="Player @(index + 1)"
+                                               class="w-full px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-700 text-slate-100 text-xs font-semibold focus:outline-none focus:border-amber-400" />
+                                    </div>
+
+                                    <!-- Custom Color Picker & Reset -->
+                                    <div class="flex items-center gap-1 shrink-0">
+                                        <label class="w-7 h-7 rounded-xl cursor-pointer border border-slate-600 flex items-center justify-center overflow-hidden hover:scale-105 transition-transform"
+                                               style="background: @player.ColorFormed();"
+                                               title="Pick custom color">
+                                            <input type="color"
+                                                   value="@player.HexColor"
+                                                   @onchange="@(e => SetPlayerHexColor(index, e.Value?.ToString() ?? "#ef4444"))"
+                                                   class="opacity-0 w-full h-full cursor-pointer" />
+                                        </label>
+                                        <button type="button"
+                                                class="w-7 h-7 rounded-xl bg-slate-700/60 hover:bg-slate-600/60 text-slate-300 text-xs flex items-center justify-center transition-colors"
+                                                @onclick="() => ResetPlayer(index)"
+                                                title="Reset to default">
+                                            🔄
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Color Quick Palette Swatches -->
+                                <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
+                                    @foreach (var colorPreset in Config.PresetColors)
+                                    {
+                                        var isColorSelected = player.RColor == colorPreset.R && player.GColor == colorPreset.G && player.BColor == colorPreset.B;
+                                        <button type="button"
+                                                class="w-5 h-5 rounded-full transition-transform @(isColorSelected ? "ring-2 ring-white scale-110 shadow" : "opacity-75 hover:opacity-100 hover:scale-105")"
+                                                style="background: rgb(@colorPreset.R, @colorPreset.G, @colorPreset.B);"
+                                                @onclick="() => SetPlayerColor(index, colorPreset)"
+                                                title="@colorPreset.Name">
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Tab 2: Grid Arena Configuration -->
+            @if (activeTab == "board")
+            {
+                <div class="space-y-3 animate-fade-in pt-1 pb-1">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button type="button"
+                                class="p-3 rounded-2xl border text-left transition-all @(Config.BoardPreset == "Auto" ? "bg-amber-500/20 border-amber-400 text-white shadow-md" : "bg-slate-800/40 border-slate-700/60 text-slate-300 hover:bg-slate-800")"
+                                @onclick='() => SetBoardPreset("Auto")'>
+                            <p class="text-xs font-bold text-amber-400">⚡ Auto Fit</p>
+                            <p class="text-[11px] text-slate-400">Smart screen fit</p>
+                        </button>
+
+                        <button type="button"
+                                class="p-3 rounded-2xl border text-left transition-all @(Config.BoardPreset == "Quick" ? "bg-amber-500/20 border-amber-400 text-white shadow-md" : "bg-slate-800/40 border-slate-700/60 text-slate-300 hover:bg-slate-800")"
+                                @onclick='() => SetBoardPreset("Quick")'>
+                            <p class="text-xs font-bold text-amber-400">📱 Quick 6×4</p>
+                            <p class="text-[11px] text-slate-400">Fast 2-3 players</p>
+                        </button>
+
+                        <button type="button"
+                                class="p-3 rounded-2xl border text-left transition-all @(Config.BoardPreset == "Classic" ? "bg-amber-500/20 border-amber-400 text-white shadow-md" : "bg-slate-800/40 border-slate-700/60 text-slate-300 hover:bg-slate-800")"
+                                @onclick='() => SetBoardPreset("Classic")'>
+                            <p class="text-xs font-bold text-amber-400">🎯 Classic 9×6</p>
+                            <p class="text-[11px] text-slate-400">Balanced arena</p>
+                        </button>
+
+                        <button type="button"
+                                class="p-3 rounded-2xl border text-left transition-all @(Config.BoardPreset == "Large" ? "bg-amber-500/20 border-amber-400 text-white shadow-md" : "bg-slate-800/40 border-slate-700/60 text-slate-300 hover:bg-slate-800")"
+                                @onclick='() => SetBoardPreset("Large")'>
+                            <p class="text-xs font-bold text-amber-400">🌋 Large 12×8</p>
+                            <p class="text-[11px] text-slate-400">Chaotic 4-8 players</p>
+                        </button>
+                    </div>
+
+                    @if (Config.BoardPreset == "Custom" || Config.IsCusTomDimention)
+                    {
+                        <div class="p-3.5 rounded-2xl bg-slate-800/50 border border-slate-700/50 grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label class="text-xs font-bold text-slate-300">↕️ Rows (4–25)</label>
+                                <input type="number" min="4" max="25" @bind="Config.Rows"
+                                       class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-bold text-sm focus:outline-none focus:border-amber-400" />
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-xs font-bold text-slate-300">↔️ Columns (4–25)</label>
+                                <input type="number" min="4" max="25" @bind="Config.Column"
+                                       class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-bold text-sm focus:outline-none focus:border-amber-400" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Tab 3: Options & Settings -->
+            @if (activeTab == "settings")
+            {
+                <div class="space-y-3 animate-fade-in pt-1 pb-1">
+                    <!-- Chain Reaction Speed -->
+                    <div class="p-3 rounded-2xl bg-slate-800/50 border border-slate-700/50 space-y-2">
+                        <label class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                            <span>⚡</span>
+                            <span>Explosion Speed</span>
                         </label>
-                    }
-                </div>
-            </section>
-
-            <!-- Player Color Customization -->
-            <div class="bg-gradient-to-br from-purple-100/70 to-pink-100/70 rounded-xl border-3 border-purple-600/40 shadow-cartoon overflow-hidden">
-                <button type="button" @onclick='() => TogglePanel("colors")'
-                        class="w-full p-3 sm:p-4 cursor-pointer font-bold text-purple-900 flex items-center justify-between select-none text-sm sm:text-base text-left"
-                        style="font-family: 'Comic Sans MS', cursive;"
-                        aria-expanded="@IsPanelOpen("colors")">
-                    <span class="flex items-center gap-2 min-w-0">
-                        <span class="shrink-0">🎨</span>
-                        <span class="truncate">Customize Player Colors</span>
-                    </span>
-                    <svg class="w-5 h-5 shrink-0 text-purple-700 transition-transform @(IsPanelOpen("colors") ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </button>
-                @if (IsPanelOpen("colors"))
-                {
-                <div class="accordion-body px-3 sm:px-4 pb-3 sm:pb-4 space-y-2 border-t border-purple-300/40">
-                    @for (int i = 0; i < Config.NumberOfPlayer && i < Config.PlayerList.Count; i++)
-                    {
-                        var player = Config.PlayerList[i];
-                        var index = i;
-                        <div class="p-2 sm:p-3 rounded-xl bg-white/70 border-2 border-purple-500/30 shadow-sm">
-                            <div class="flex items-center gap-3 mb-2 min-w-0">
-                                <div class="w-8 h-8 rounded-full shadow-md border-3 border-purple-600 transition-all shrink-0" 
-                                     style="background: @player.ColorFormed();"></div>
-                                <span class="font-bold text-sm md:text-base text-purple-900 truncate min-w-0" style="font-family: 'Comic Sans MS', cursive;">
-                                    @player.Name
-                                </span>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                <div>
-                                    <label class="block text-xs font-bold text-red-700 mb-1" style="font-family: 'Comic Sans MS', cursive;">🔴 Red</label>
-                                    <input type="range" min="0" max="255" 
-                                           value="@player.RColor" 
-                                           @oninput="@(e => UpdatePlayerColor(index, 'R', int.Parse(e.Value?.ToString() ?? "0")))"
-                                           class="w-full h-2 bg-red-200 rounded-lg appearance-none cursor-pointer accent-red-500" />
-                                    <div class="text-center text-xs font-bold text-red-900 mt-1">@player.RColor</div>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-green-700 mb-1" style="font-family: 'Comic Sans MS', cursive;">🟢 Green</label>
-                                    <input type="range" min="0" max="255" 
-                                           value="@player.GColor" 
-                                           @oninput="@(e => UpdatePlayerColor(index, 'G', int.Parse(e.Value?.ToString() ?? "0")))"
-                                           class="w-full h-2 bg-green-200 rounded-lg appearance-none cursor-pointer accent-green-500" />
-                                    <div class="text-center text-xs font-bold text-green-900 mt-1">@player.GColor</div>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-blue-700 mb-1" style="font-family: 'Comic Sans MS', cursive;">🔵 Blue</label>
-                                    <input type="range" min="0" max="255" 
-                                           value="@player.BColor" 
-                                           @oninput="@(e => UpdatePlayerColor(index, 'B', int.Parse(e.Value?.ToString() ?? "0")))"
-                                           class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-500" />
-                                    <div class="text-center text-xs font-bold text-blue-900 mt-1">@player.BColor</div>
-                                </div>
-                            </div>
-                            <div class="mt-2 flex gap-2">
-                                <input type="color" 
-                                       value="@RgbToHex(player.RColor, player.GColor, player.BColor)" 
-                                       @onchange="@(e => UpdatePlayerColorFromHex(index, e.Value?.ToString() ?? "#000000"))"
-                                       class="w-full h-10 rounded-lg cursor-pointer border-2 border-purple-600" 
-                                       title="Pick a color" />
-                                <button @onclick="@(() => ResetPlayerColor(index))" 
-                                        class="px-3 py-2 rounded-lg bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold text-xs shadow-md hover:shadow-lg transition-all border-2 border-amber-600"
-                                        style="font-family: 'Comic Sans MS', cursive;">
-                                    🔄 Reset
+                        <div class="grid grid-cols-3 gap-2">
+                            @foreach (var speed in new[] { "Fast", "Normal", "Dramatic" })
+                            {
+                                <button type="button"
+                                        class="py-2 px-3 rounded-xl text-xs font-bold transition-all @(Config.GameSpeed == speed ? "bg-amber-500 text-slate-950 shadow" : "bg-slate-900/80 text-slate-400 hover:text-white")"
+                                        @onclick="() => Config.GameSpeed = speed">
+                                    @speed
                                 </button>
-                            </div>
+                            }
                         </div>
-                    }
+                    </div>
+
+                    <!-- Audio & Feedback -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <label class="flex items-center gap-3 p-3 rounded-2xl bg-slate-800/50 border border-slate-700/50 cursor-pointer hover:bg-slate-800/80 transition-colors">
+                            <input type="checkbox" @bind="Config.Dhwani" class="w-5 h-5 rounded-lg border-slate-600 bg-slate-900 text-amber-500 focus:ring-amber-400 cursor-pointer" />
+                            <div>
+                                <p class="text-xs sm:text-sm font-bold text-slate-200">🔊 Sound Effects</p>
+                                <p class="text-[11px] text-slate-400">Procedural pops & explosions</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center gap-3 p-3 rounded-2xl bg-slate-800/50 border border-slate-700/50 cursor-pointer hover:bg-slate-800/80 transition-colors">
+                            <input type="checkbox" @bind="Config.Kampan" class="w-5 h-5 rounded-lg border-slate-600 bg-slate-900 text-amber-500 focus:ring-amber-400 cursor-pointer" />
+                            <div>
+                                <p class="text-xs sm:text-sm font-bold text-slate-200">📳 Haptic Vibration</p>
+                                <p class="text-[11px] text-slate-400">Mobile explosion feedback</p>
+                            </div>
+                        </label>
+                    </div>
                 </div>
-                }
-            </div>
+            }
 
-            <!-- Advanced Settings -->
-            <div class="bg-gradient-to-br from-white/70 to-yellow-50/70 rounded-xl border-3 border-amber-600/40 shadow-cartoon overflow-hidden">
-                <button type="button" @onclick='() => TogglePanel("settings")'
-                        class="w-full p-3 sm:p-4 cursor-pointer font-bold text-amber-900 flex items-center justify-between select-none text-sm sm:text-base text-left"
-                        style="font-family: 'Comic Sans MS', cursive;"
-                        aria-expanded="@IsPanelOpen("settings")">
-                    <span class="flex items-center gap-2 min-w-0">
-                        <span class="shrink-0">⚙️</span>
-                        <span class="truncate">Advanced Settings</span>
-                    </span>
-                    <svg class="w-5 h-5 shrink-0 text-amber-700 transition-transform @(IsPanelOpen("settings") ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </button>
-                @if (IsPanelOpen("settings"))
-                {
-                <div class="accordion-body px-3 sm:px-4 pb-3 sm:pb-4 space-y-2 border-t border-amber-300/40">
-                    <label class="flex items-center gap-3 p-2.5 sm:p-3 rounded-lg bg-yellow-50/70 border-2 border-amber-500/30 cursor-pointer">
-                        <input type="checkbox" @bind="Config.Kampan" class="h-5 w-5 rounded-lg border-2 border-amber-600 text-yellow-500 focus:ring-yellow-400 cursor-pointer shrink-0" />
-                        <div class="flex-1 min-w-0">
-                            <div class="font-bold text-sm text-amber-900" style="font-family: 'Comic Sans MS', cursive;">📳 Vibration</div>
-                        </div>
-                    </label>
-                    
-                    <label class="flex items-center gap-3 p-2.5 sm:p-3 rounded-lg bg-yellow-50/70 border-2 border-amber-500/30 cursor-pointer">
-                        <input type="checkbox" @bind="Config.Dhwani" class="h-5 w-5 rounded-lg border-2 border-amber-600 text-yellow-500 focus:ring-yellow-400 cursor-pointer shrink-0" />
-                        <div class="flex-1 min-w-0">
-                            <div class="font-bold text-sm text-amber-900" style="font-family: 'Comic Sans MS', cursive;">🔊 Sound Effects</div>
-                        </div>
-                    </label>
-                    
-                    <label class="flex items-center gap-3 p-2.5 sm:p-3 rounded-lg bg-yellow-50/70 border-2 border-amber-500/30 cursor-pointer">
-                        <input type="checkbox" @bind="Config.IsCusTomDimention" class="h-5 w-5 rounded-lg border-2 border-amber-600 text-yellow-500 focus:ring-yellow-400 cursor-pointer shrink-0" />
-                        <div class="flex-1 min-w-0">
-                            <div class="font-bold text-sm text-amber-900" style="font-family: 'Comic Sans MS', cursive;">📐 Custom Dimensions</div>
-                        </div>
-                    </label>
-
-                    @if(Config.IsCusTomDimention)
-                    {
-                        <div class="grid grid-cols-2 gap-2 pt-1">
-                            <div class="space-y-1">
-                                <label class="block text-xs font-black text-amber-900" style="font-family: 'Comic Sans MS', cursive;">↕️ Rows</label>
-                                <input type="number" @bind="Config.Rows" min="4" max="100" step="1" 
-                                    class="w-full px-3 py-2 rounded-lg border-2 border-amber-600 bg-yellow-50 text-amber-900 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400" />
-                            </div>
-                            <div class="space-y-1">
-                                <label class="block text-xs font-black text-amber-900" style="font-family: 'Comic Sans MS', cursive;">↔️ Columns</label>
-                                <input type="number" @bind="Config.Column" min="4" max="100" step="1" 
-                                    class="w-full px-3 py-2 rounded-lg border-2 border-amber-600 bg-yellow-50 text-amber-900 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400" />
-                            </div>
-                        </div>
-                    }
-                </div>
-                }
-            </div>
-
-            </div>
-            </div>
         </div>
     </div>
 
-    <!-- Play button — fixed on mobile so it stays visible when panels expand -->
-    <div class="home-play-bar shrink-0">
-        <div class="mx-auto w-full max-w-lg sm:max-w-xl md:max-w-2xl px-3 sm:px-4">
-            <button class="cartoon-btn w-full sm:max-w-sm sm:mx-auto sm:flex px-6 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-br from-yellow-400 via-amber-400 to-orange-500 text-amber-900 text-base sm:text-lg font-black shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95 border-3 border-amber-700" @onclick="StartGame" style="font-family: 'Chewy', cursive;">
-                <span class="relative z-10 flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
-                    </svg>
-                    🎮 Start the Chase!
-                </span>
-            </button>
-            <p class="text-center text-xs text-amber-800/80 font-semibold mt-1.5 sm:mt-2" style="font-family: 'Comic Sans MS', cursive;">
-                @Config.NumberOfPlayer player@(Config.NumberOfPlayer > 1 ? "s" : "") · local game
-            </p>
-        </div>
+    <!-- Bottom Action Bar -->
+    <div class="w-full max-w-2xl mx-auto shrink-0 pt-1">
+        <button type="button"
+                class="game-btn w-full py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-base sm:text-lg tracking-wide shadow-xl shadow-amber-500/25 border border-amber-300/50 flex items-center justify-center gap-2.5 transition-all"
+                @onclick="StartGame"
+                style="font-family: 'Outfit', sans-serif;">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
+            </svg>
+            <span>START MATCH · @Config.NumberOfPlayer PLAYERS</span>
+        </button>
     </div>
+
 </main>
-
-@code {
-    // Store default colors for reset functionality
-    private static readonly List<(int R, int G, int B)> DefaultColors = new()
-    {
-        (70, 130, 180),   // Blue Cat
-        (205, 133, 63),   // Brown Mouse
-        (255, 140, 0),    // Orange
-        (255, 215, 0),    // Yellow Cheese
-        (60, 179, 113),   // Green
-        (147, 112, 219)   // Purple
-    };
-
-    private string? openPanel;
-
-    private void TogglePanel(string panel)
-    {
-        openPanel = openPanel == panel ? null : panel;
-    }
-
-    private bool IsPanelOpen(string panel) => openPanel == panel;
-
-    private void SelectPlayerCount(int count)
-    {
-        Config.NumberOfPlayer = count;
-        StateHasChanged();
-    }
-
-    private string GetPlayerButtonClass(int playerCount)
-    {
-        var baseClass = "flex items-center justify-center min-w-[40px] sm:min-w-[48px] px-3 py-2 rounded-lg border-3 cursor-pointer transition-all duration-200 font-black shadow-md hover:shadow-lg";
-        var isSelected = Config.NumberOfPlayer == playerCount;
-        
-        if (isSelected)
-        {
-            return $"{baseClass} border-amber-700 bg-gradient-to-br from-yellow-400 to-amber-500 shadow-cartoon text-amber-900 scale-105";
-        }
-        else
-        {
-            return $"{baseClass} border-amber-600/40 bg-white/90 text-amber-800 hover:bg-yellow-50 hover:border-amber-600";
-        }
-    }
-
-    private void UpdatePlayerColor(int playerIndex, char colorChannel, int value)
-    {
-        if (playerIndex >= 0 && playerIndex < Config.PlayerList.Count)
-        {
-            var player = Config.PlayerList[playerIndex];
-            switch (colorChannel)
-            {
-                case 'R':
-                    player.RColor = value;
-                    break;
-                case 'G':
-                    player.GColor = value;
-                    break;
-                case 'B':
-                    player.BColor = value;
-                    break;
-            }
-            StateHasChanged();
-        }
-    }
-
-    private void UpdatePlayerColorFromHex(int playerIndex, string hexColor)
-    {
-        if (playerIndex >= 0 && playerIndex < Config.PlayerList.Count && !string.IsNullOrEmpty(hexColor))
-        {
-            // Remove # if present
-            hexColor = hexColor.TrimStart('#');
-            
-            if (hexColor.Length == 6)
-            {
-                try
-                {
-                    var player = Config.PlayerList[playerIndex];
-                    player.RColor = Convert.ToInt32(hexColor.Substring(0, 2), 16);
-                    player.GColor = Convert.ToInt32(hexColor.Substring(2, 2), 16);
-                    player.BColor = Convert.ToInt32(hexColor.Substring(4, 2), 16);
-                    StateHasChanged();
-                }
-                catch
-                {
-                    // Invalid hex color, ignore
-                }
-            }
-        }
-    }
-
-    private void ResetPlayerColor(int playerIndex)
-    {
-        if (playerIndex >= 0 && playerIndex < Config.PlayerList.Count && playerIndex < DefaultColors.Count)
-        {
-            var player = Config.PlayerList[playerIndex];
-            var defaultColor = DefaultColors[playerIndex];
-            player.RColor = defaultColor.R;
-            player.GColor = defaultColor.G;
-            player.BColor = defaultColor.B;
-            StateHasChanged();
-        }
-    }
-
-    private string RgbToHex(int r, int g, int b)
-    {
-        return $"#{r:X2}{g:X2}{b:X2}";
-    }
-}

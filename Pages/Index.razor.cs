@@ -1,8 +1,8 @@
-﻿
 using ChainReaction.Components;
 using ChainReaction.Model;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+
 namespace ChainReaction.Pages;
 
 public partial class Index : IAsyncDisposable
@@ -10,217 +10,353 @@ public partial class Index : IAsyncDisposable
     [Inject] protected IJSRuntime JSRuntime { get; set; } = null!;
     [Inject] public NavigationManager NavigationManager { get; set; } = null!;
 
-    bool busy = false;
-    int count = 0;
-    int column = 0;
-    int row = 0;
-    WindowSize? windowSize;
-    DotNetObjectReference<Index>? dotNetRef;
-    const int MinCellSize = 28;
-    const int MaxCellSize = 64;
-    const int HorizontalPadding = 48;
-    const int VerticalPadding = 80;
-    List<List<Cell>> gridOfCells = [];
-    List<Player> livePlayerList = [];
-    // Scoring handeling
-    int lostPeriodForPlayerIndexingInLeaderboard = 0;
-    bool allPlayerPlayed = false;
-    readonly HashSet<string> allPlayerPlayedList = [];
-    readonly Dictionary<string, (DateTime Date, string color, int Period)> lostPlayers = [];
-    public Dictionary<string, (DateTime Date, string color, int Period)> ScoreLeaderWithTime => lostPlayers;
-    bool dialogShown = false;
-    bool closingForReplay = false;
+    private bool busy = false;
+    private int currentPlayerIndex = 0;
+    private int column = 6;
+    private int row = 9;
+    private WindowSize? windowSize;
+    private DotNetObjectReference<Index>? dotNetRef;
+
+    private List<List<Cell>> gridOfCells = [];
+    private List<Player> livePlayerList = [];
+    private List<Player> initialPlayerList = [];
+
+    // Scoring & Stats
+    private int totalMoves = 0;
+    private int currentRound = 1;
+    private int lostPeriodForPlayerIndexingInLeaderboard = 0;
+    private bool allPlayerPlayed = false;
+    private readonly HashSet<string> allPlayerPlayedList = [];
+    private readonly Dictionary<string, (DateTime Date, string color, int Period, int MaxCells)> lostPlayers = [];
+    public Dictionary<string, (DateTime Date, string color, int Period, int MaxCells)> ScoreLeaderWithTime => lostPlayers;
+
+    private bool dialogShown = false;
+    private bool confirmLeaveOpen = false;
+    private bool confirmRestartOpen = false;
+    private bool helpOpen = false;
+
+    public Player? CurrentPlayer => (livePlayerList.Count > 0 && currentPlayerIndex < livePlayerList.Count) 
+        ? livePlayerList[currentPlayerIndex] 
+        : null;
+
     public async Task UserClicked(Cell cell)
     {
+        if (busy || CurrentPlayer is null) return;
 
-        if (busy) return;
-        if (string.IsNullOrEmpty(cell.Name) || cell.Name == livePlayerList[count].Name)
+        // Validation: player can only click on empty cells or cells they own
+        if (cell.IsAvailableFor(CurrentPlayer.Name))
         {
             busy = true;
+            totalMoves++;
+
+            // Play orb placement pop sound
+            if (Config.Dhwani)
+            {
+                try
+                {
+                    double pitch = 0.9 + (currentPlayerIndex * 0.1);
+                    _ = JSRuntime.InvokeVoidAsync("blazorFunctions.PlayPop", pitch);
+                }
+                catch {}
+            }
+
             AllPlayerValidation();
-            await Increase(cell);
+
+            // Execute placement and chain reactions
+            int chainReactionCount = 0;
+            await PlaceOrbAndResolve(cell, chainReactionCount);
+
+            // Update stats
+            UpdatePlayerStats();
+
             if (allPlayerPlayed)
             {
                 CalculateScore();
                 if (livePlayerList.Count == 1)
                 {
-                    await Task.Delay(1000);
+                    await Task.Delay(400);
                     ShowLeaderBoard();
+                    busy = false;
+                    StateHasChanged();
+                    return;
                 }
             }
-            count++;
-            count %= livePlayerList.Count;
-        }
-        Config.CurrentUserColor = livePlayerList[count].ColorFormed();
-        Config.HoverColor = livePlayerList[count].HoverColorFormed();
-        busy = false;
-    }
-    #region Score Logic
-    void AllPlayerValidation()
-    {
-        if (!allPlayerPlayed)
-        {
-            allPlayerPlayedList.Add(livePlayerList[count].Name);
-            allPlayerPlayed = (allPlayerPlayedList.Count == livePlayerList.Count);
+
+            // Next player turn
+            if (livePlayerList.Count > 0)
+            {
+                currentPlayerIndex = (currentPlayerIndex + 1) % livePlayerList.Count;
+                if (currentPlayerIndex == 0)
+                {
+                    currentRound++;
+                }
+
+                var nextPlayer = livePlayerList[currentPlayerIndex];
+                Config.CurrentUserColor = nextPlayer.ColorFormed();
+                Config.HoverColor = nextPlayer.HoverColorFormed();
+            }
+
+            busy = false;
+            StateHasChanged();
         }
     }
 
-    void CalculateScore()
+    private async Task PlaceOrbAndResolve(Cell initialCell, int chainLevel)
+    {
+        var player = CurrentPlayer;
+        if (player is null) return;
+
+        initialCell.CurrentCount++;
+        initialCell.Name = player.Name;
+        initialCell.Color = player.ColorFormed();
+
+        // Check if any cell in grid exceeds its capacity
+        Queue<(int X, int Y)> explosionQueue = new();
+        if (initialCell.CurrentCount > initialCell.Capacity)
+        {
+            explosionQueue.Enqueue((initialCell.X, initialCell.Y));
+        }
+
+        int comboStep = 1;
+        while (explosionQueue.Count > 0)
+        {
+            int waveSize = explosionQueue.Count;
+            List<(int X, int Y)> nextOrbs = new();
+
+            // Trigger feedback for explosion wave
+            if (Config.Kampan || Config.Dhwani)
+            {
+                _ = Feedback(comboStep);
+            }
+
+            for (int w = 0; w < waveSize; w++)
+            {
+                var (cx, cy) = explosionQueue.Dequeue();
+                var cell = gridOfCells[cx][cy];
+                if (cell.CurrentCount <= cell.Capacity) continue;
+
+                cell.CurrentCount = 0;
+                cell.Name = string.Empty;
+                cell.Color = string.Empty;
+
+                var neighbors = new (int X, int Y)[]
+                {
+                    (cx - 1, cy),
+                    (cx + 1, cy),
+                    (cx, cy - 1),
+                    (cx, cy + 1)
+                };
+
+                foreach (var (nx, ny) in neighbors)
+                {
+                    if (nx >= 0 && nx < row && ny >= 0 && ny < column)
+                    {
+                        nextOrbs.Add((nx, ny));
+                    }
+                }
+            }
+
+            // Distribute orbs to neighbors
+            foreach (var (nx, ny) in nextOrbs)
+            {
+                var target = gridOfCells[nx][ny];
+                target.CurrentCount++;
+                target.Name = player.Name;
+                target.Color = player.ColorFormed();
+
+                if (target.CurrentCount > target.Capacity && !explosionQueue.Contains((nx, ny)))
+                {
+                    explosionQueue.Enqueue((nx, ny));
+                }
+            }
+
+            comboStep++;
+            StateHasChanged();
+            await Task.Delay(Config.DelayTimeInMilliSecond);
+
+            // Mid-chain victory check
+            if (allPlayerPlayed && !IsMoreThanOnePlayerAlive())
+            {
+                break;
+            }
+        }
+    }
+
+    private void UpdatePlayerStats()
+    {
+        foreach (var p in initialPlayerList)
+        {
+            p.CellCount = 0;
+            p.OrbCount = 0;
+        }
+
+        for (int i = 0; i < row; i++)
+        {
+            for (int j = 0; j < column; j++)
+            {
+                var cell = gridOfCells[i][j];
+                if (!string.IsNullOrEmpty(cell.Name) && cell.CurrentCount > 0)
+                {
+                    var p = initialPlayerList.FirstOrDefault(x => x.Name == cell.Name);
+                    if (p is not null)
+                    {
+                        p.CellCount++;
+                        p.OrbCount += cell.CurrentCount;
+                    }
+                }
+            }
+        }
+    }
+
+    #region Score Logic
+    private void AllPlayerValidation()
+    {
+        if (!allPlayerPlayed && CurrentPlayer is not null)
+        {
+            allPlayerPlayedList.Add(CurrentPlayer.Name);
+            allPlayerPlayed = (allPlayerPlayedList.Count == initialPlayerList.Count);
+        }
+    }
+
+    private void CalculateScore()
     {
         lostPeriodForPlayerIndexingInLeaderboard++;
-        var currentPlayer = livePlayerList[count];
-        var alivePlayer = new HashSet<string>();
+        var alivePlayerNames = new HashSet<string>();
         for (var i = 0; i < gridOfCells.Count; i++)
         {
             for (int j = 0; j < gridOfCells[0].Count; j++)
             {
                 var cell = gridOfCells[i][j];
-                if (cell.CurrentCount > 0)
+                if (cell.CurrentCount > 0 && !string.IsNullOrEmpty(cell.Name))
                 {
-                    alivePlayer.Add(cell.Name);
+                    alivePlayerNames.Add(cell.Name);
                 }
             }
         }
-        var finalPlayerLeft = new List<Player>();
-        int pos = 0;
-        int index = 0;
-        foreach (var item in livePlayerList)
+
+        var remainingPlayers = new List<Player>();
+        int newCurrentIndex = 0;
+        var currentPlayer = CurrentPlayer;
+
+        foreach (var player in livePlayerList)
         {
-            if (alivePlayer.Contains(item.Name))
+            if (alivePlayerNames.Contains(player.Name))
             {
-                finalPlayerLeft.Add(item);
-                if (currentPlayer == item)
+                remainingPlayers.Add(player);
+                if (currentPlayer == player)
                 {
-                    pos = index;
+                    newCurrentIndex = remainingPlayers.Count - 1;
                 }
-                index++;
             }
             else
             {
-                lostPlayers.TryAdd(item.Name, (DateTime.Now, item.HoverColorFormed(), lostPeriodForPlayerIndexingInLeaderboard));
+                player.IsEliminated = true;
+                lostPlayers.TryAdd(player.Name, (DateTime.Now, player.ColorFormed(), lostPeriodForPlayerIndexingInLeaderboard, player.CellCount));
+                
+                if (Config.Dhwani)
+                {
+                    try
+                    {
+                        _ = JSRuntime.InvokeVoidAsync("blazorFunctions.PlayEliminate");
+                    }
+                    catch {}
+                }
             }
         }
-        livePlayerList = finalPlayerLeft;
-        count = pos;
+
+        livePlayerList = remainingPlayers;
+        if (livePlayerList.Count > 0)
+        {
+            currentPlayerIndex = Math.Clamp(newCurrentIndex, 0, livePlayerList.Count - 1);
+        }
     }
-    bool IsMoreThanOnePlayerAlive()
+
+    private bool IsMoreThanOnePlayerAlive()
     {
-        var alivePlayer = new HashSet<string>();
+        var alivePlayers = new HashSet<string>();
         for (var i = 0; i < gridOfCells.Count; i++)
         {
             for (int j = 0; j < gridOfCells[0].Count; j++)
             {
                 var cell = gridOfCells[i][j];
-                if (cell.CurrentCount > 0)
+                if (cell.CurrentCount > 0 && !string.IsNullOrEmpty(cell.Name))
                 {
-                    alivePlayer.Add(cell.Name);
+                    alivePlayers.Add(cell.Name);
                 }
             }
         }
-        return alivePlayer.Count > 1;
+        return alivePlayers.Count > 1;
     }
-    void RecursiveLookUp()
-    {
-        if (!dialogShown)
-        {
-            if (Config.Kampan || Config.Dhwani)
-            {
-                _ = Feedback();
-            }
-            if (allPlayerPlayed && !IsMoreThanOnePlayerAlive())
-            {
-                CalculateScore();
-                if (livePlayerList.Count == 1)
-                {
-                    Task.Delay(1000);
-                    ShowLeaderBoard();
-                }
-            }
-        }
-    }
-    void ShowLeaderBoard()
+
+    private void ShowLeaderBoard()
     {
         dialogShown = true;
         lostPeriodForPlayerIndexingInLeaderboard++;
-        lostPlayers.TryAdd(livePlayerList[0].Name,
-            (DateTime.Now, livePlayerList[0].HoverColorFormed(), lostPeriodForPlayerIndexingInLeaderboard));
-        var list = lostPlayers.OrderBy(x => x.Value).Select(x => x.Key).ToList();
+        if (livePlayerList.Count > 0)
+        {
+            var winner = livePlayerList[0];
+            lostPlayers.TryAdd(winner.Name, (DateTime.Now, winner.ColorFormed(), lostPeriodForPlayerIndexingInLeaderboard + 10, winner.CellCount));
+        }
+
+        if (Config.Dhwani)
+        {
+            try
+            {
+                _ = JSRuntime.InvokeVoidAsync("blazorFunctions.PlayVictory");
+            }
+            catch {}
+        }
     }
     #endregion
-    public async Task Increase(Cell cell)
+
+    private void ToggleSound()
     {
-        cell.CurrentCount++;
-        cell.Name = livePlayerList[count].Name;
-        cell.Color = livePlayerList[count].ColorFormed();
-        
-        if (cell.CurrentCount > cell.Capacity)
+        Config.Dhwani = !Config.Dhwani;
+        try
         {
-            RecursiveLookUp(); // take care of Infinite Case 
-            // Bug Founed by Abhijeet Kumar
-
-            cell.CurrentCount = 0;
-            cell.Name = string.Empty;
-            #region neighbour 
-
-            var ls = new List<(int, int)>
-            {
-                (cell.X,     cell.Y - 1),
-                (cell.X,     cell.Y + 1),
-                (cell.X - 1, cell.Y ),
-                (cell.X + 1, cell.Y )
-            };
-
-            foreach (var (x, y) in ls)
-            {
-                if (x >= 0 && y >= 0 && y < column && x < row)
-                {
-                    await Increase(gridOfCells[x][y]);
-                    await Task.Delay(Config.DelayTimeInMilliSecond);
-                    StateHasChanged();
-                }
-            }
-            #endregion
+            _ = JSRuntime.InvokeVoidAsync("blazorFunctions.SetMute", !Config.Dhwani);
         }
-    } 
-    public void GoHome()
+        catch {}
+    }
+
+    private void GoHome()
     {
+        confirmLeaveOpen = false;
         dialogShown = false;
         NavigationManager.NavigateTo("");
     }
 
-    public void PlayAgain()
+    private void RestartMatch()
     {
-        closingForReplay = true;
+        confirmRestartOpen = false;
         dialogShown = false;
         ResetForNewGame();
-        closingForReplay = false;
         StateHasChanged();
     }
 
-    async Task HandleGameOverModalChanged(bool isOpen)
-    {
-        dialogShown = isOpen;
-        if (!isOpen && !closingForReplay)
-        {
-            NavigationManager.NavigateTo("");
-        }
-    }
-
-    void ResetForNewGame()
+    private void ResetForNewGame()
     {
         busy = false;
-        count = 0;
+        currentPlayerIndex = 0;
+        totalMoves = 0;
+        currentRound = 1;
         lostPeriodForPlayerIndexingInLeaderboard = 0;
         allPlayerPlayed = false;
         allPlayerPlayedList.Clear();
         lostPlayers.Clear();
-        Reset();
+        ResetGridAndPlayers();
     }
-    private async Task Feedback()
+
+    private async Task Feedback(int comboLevel)
     {
-        await JSRuntime.InvokeVoidAsync("blazorFunctions.BhukampLao",Config.Kampan,Config.Dhwani);
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("blazorFunctions.BhukampLao", Config.Kampan, Config.Dhwani, comboLevel);
+        }
+        catch {}
     }
-    #region Setting Up Enviroment
+
+    #region Grid Initialization & Precision Sizing
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -246,10 +382,7 @@ public partial class Index : IAsyncDisposable
         {
             await JSRuntime.InvokeVoidAsync("chainReactionLayout.unregister");
         }
-        catch (JSDisconnectedException)
-        {
-            // Page is unloading.
-        }
+        catch (JSDisconnectedException) {}
     }
 
     private async Task GetInnerDimensions()
@@ -258,46 +391,62 @@ public partial class Index : IAsyncDisposable
         Resize();
     }
 
-    void Resize()
+    private void Resize()
     {
-        if (windowSize is null)
-        {
-            return;
-        }
+        if (windowSize is null) return;
 
-        var availWidth = Math.Max(windowSize.Width - HorizontalPadding, MinCellSize * 4);
-        var availHeight = Math.Max(windowSize.Height - VerticalPadding, MinCellSize * 4);
+        bool isDesktop = windowSize.Width >= 1024;
+        int boardOuterPadding = 16;
+
+        int availWidth;
+        int availHeight;
+
+        if (isDesktop)
+        {
+            // On desktop: 320px Sidebar + 48px padding & gaps
+            availWidth = Math.Max(windowSize.Width - 368, 200);
+            availHeight = Math.Max(windowSize.Height - 48, 200);
+        }
+        else
+        {
+            // On mobile: ~105px top UI overhead + 20px bottom safe area
+            int topUiOverhead = 105;
+            availWidth = Math.Max(windowSize.Width - 24, 180);
+            availHeight = Math.Max(windowSize.Height - topUiOverhead - 20, 180);
+        }
 
         int newColumn;
         int newRow;
-        if (Config.IsCusTomDimention && Config.Rows >= 4 && Config.Rows <= 100 && Config.Column >= 4 && Config.Column <= 100)
+        if (Config.IsCusTomDimention && Config.Rows >= 4 && Config.Rows <= 30 && Config.Column >= 4 && Config.Column <= 30)
         {
             newRow = Config.Rows;
             newColumn = Config.Column;
         }
         else
         {
-            int extra = windowSize.Width > 1400 ? 3 : 0;
-            newColumn = Math.Max(4, availWidth / MaxCellSize - extra);
-            newRow = Math.Max(4, availHeight / MaxCellSize - 2);
+            // Smart auto-orientation matching screen ratio:
+            if (availWidth < availHeight)
+            {
+                // Portrait (phone / vertical tablet)
+                newColumn = 6;
+                newRow = 9;
+            }
+            else
+            {
+                // Landscape (desktop / horizontal tablet)
+                newColumn = 9;
+                newRow = 6;
+            }
         }
 
-        var cellByWidth = availWidth / newColumn;
-        var cellByHeight = availHeight / newRow;
-        var fitCellSize = Math.Min(cellByWidth, cellByHeight);
-        int newCellHeight;
-        if (fitCellSize >= MinCellSize)
-        {
-            newCellHeight = Math.Min((int)fitCellSize, MaxCellSize);
-        }
-        else if (Config.IsCusTomDimention)
-        {
-            newCellHeight = Math.Max(20, (int)fitCellSize);
-        }
-        else
-        {
-            newCellHeight = MinCellSize;
-        }
+        // Exact maximum cell size guaranteeing ZERO overflow in both axes:
+        int maxCellW = (availWidth - boardOuterPadding) / newColumn;
+        int maxCellH = (availHeight - boardOuterPadding) / newRow;
+        int fitCellSize = Math.Min(maxCellW, maxCellH);
+
+        // Clamp between Min 22px and Max (80px on desktop, 64px on mobile)
+        int maxAllowed = isDesktop ? 80 : 64;
+        int newCellHeight = Math.Clamp(fitCellSize, 22, maxAllowed);
 
         var gridChanged = gridOfCells.Count == 0 || newColumn != column || newRow != row;
         column = newColumn;
@@ -306,54 +455,64 @@ public partial class Index : IAsyncDisposable
 
         if (gridChanged)
         {
-            Reset();
+            ResetGridAndPlayers();
         }
 
         StateHasChanged();
     }
-    void Reset()
-    {
 
-        livePlayerList = Config.SuffeledArray(Config.PlayerList.Take(Config.NumberOfPlayer).ToList());
-        Config.CurrentUserColor = livePlayerList[0].ColorFormed();
-        gridOfCells = [];
-        if(Config.IsCusTomDimention &&Config.Rows>=4 && Config.Rows<=100 && Config.Column>=4 && Config.Column<=100)
-        { 
-            row = Config.Rows;
-            column = Config.Column;
+    private void ResetGridAndPlayers()
+    {
+        var rawPlayers = Config.PlayerList.Take(Config.NumberOfPlayer).ToList();
+        foreach (var p in rawPlayers)
+        {
+            p.CellCount = 0;
+            p.OrbCount = 0;
+            p.IsEliminated = false;
         }
+
+        initialPlayerList = rawPlayers.Select(p => p.Clone()).ToList();
+        livePlayerList = Config.SuffeledArray(initialPlayerList.Select(p => p.Clone()).ToList());
+
+        if (livePlayerList.Count > 0)
+        {
+            Config.CurrentUserColor = livePlayerList[0].ColorFormed();
+            Config.HoverColor = livePlayerList[0].HoverColorFormed();
+        }
+
+        gridOfCells = [];
         for (int i = 0; i < row; i++)
         {
-            var ls = new List<Cell>();
+            var rowList = new List<Cell>();
             for (int j = 0; j < column; j++)
             {
-                ls.Add(new Cell()
+                rowList.Add(new Cell
                 {
                     X = i,
                     Y = j,
-                    Capacity = Config.CellCapacity,
+                    Capacity = 3,
                     CurrentCount = 0
                 });
             }
-            gridOfCells.Add(ls);
+            gridOfCells.Add(rowList);
         }
 
-        // setting capacity for edge cases
+        // Set capacities for edges and corners
         for (int i = 0; i < row; i++)
         {
             gridOfCells[i][0].Capacity = 2;
             gridOfCells[i][column - 1].Capacity = 2;
         }
-        for (int i = 0; i < column; i++)
+        for (int j = 0; j < column; j++)
         {
-            gridOfCells[0][i].Capacity = 2;
-            gridOfCells[row - 1][i].Capacity = 2;
+            gridOfCells[0][j].Capacity = 2;
+            gridOfCells[row - 1][j].Capacity = 2;
         }
+
         gridOfCells[0][0].Capacity = 1;
         gridOfCells[0][column - 1].Capacity = 1;
         gridOfCells[row - 1][0].Capacity = 1;
         gridOfCells[row - 1][column - 1].Capacity = 1;
     }
-
     #endregion
 }

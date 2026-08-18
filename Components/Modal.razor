@@ -2,32 +2,32 @@
 
 @if (IsOpen)
 {
-    <div class="modal-overlay fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm animate-fade-in p-3 sm:p-4" @onclick="OnBackdropClick">
-        <div class="flex min-h-full items-start justify-center py-2 sm:py-6">
-            <div class="modal-panel relative w-full max-w-[min(100%,42rem)] max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-3rem)] flex flex-col bg-gradient-to-br from-amber-50/98 to-yellow-50/98 backdrop-blur-xl rounded-2xl shadow-2xl ring-4 ring-amber-800/40 border-4 border-amber-700/50 animate-scale-in min-w-0" @onclick:stopPropagation>
-                @if (!string.IsNullOrEmpty(Title))
-                {
-                    <div class="shrink-0 px-4 py-3 sm:py-4 pr-14 border-b-3 border-amber-600/40 bg-gradient-to-r from-amber-100/80 to-yellow-100/80 rounded-t-2xl">
-                        <h2 class="text-lg sm:text-xl md:text-2xl font-black text-amber-900 leading-tight" style="font-family: 'Chewy', cursive;">@Title</h2>
-                    </div>
-                }
-                <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain p-3 sm:p-4">
-                    @ChildContent
+    <div class="modal-overlay fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md animate-fade-in p-3 sm:p-4 flex items-center justify-center" @onclick="OnBackdropClick">
+        <div class="modal-panel relative w-full max-w-[min(100%,36rem)] max-h-[calc(100dvh-2rem)] flex flex-col glass-card rounded-3xl shadow-2xl border border-slate-700/60 animate-scale-in text-slate-100 overflow-hidden" @onclick:stopPropagation>
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <div class="shrink-0 px-5 py-4 pr-14 border-b border-slate-700/50 bg-slate-800/40 flex items-center justify-between">
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-100 flex items-center gap-2">
+                        @Title
+                    </h2>
                 </div>
-                @if (Footer is not null)
-                {
-                    <div class="shrink-0 px-4 py-3 sm:py-4 border-t-3 border-amber-600/40 bg-gradient-to-r from-amber-100/80 to-yellow-100/80 rounded-b-2xl">
-                        @Footer
-                    </div>
-                }
-                <button class="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg transition-all duration-200 active:scale-95 border-2 border-red-800 z-10" 
-                        @onclick="Close"
-                        aria-label="Close">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
+            }
+            <div class="flex-1 min-h-0 overflow-y-auto p-4 sm:p-5 text-sm sm:text-base leading-relaxed">
+                @ChildContent
             </div>
+            @if (Footer is not null)
+            {
+                <div class="shrink-0 px-5 py-3.5 border-t border-slate-700/50 bg-slate-800/40">
+                    @Footer
+                </div>
+            }
+            <button class="absolute top-3 right-3 h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center rounded-xl bg-slate-800/80 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-slate-700/60 hover:border-rose-500/40 transition-all duration-150 active:scale-95 z-10" 
+                    @onclick="Close"
+                    aria-label="Close modal">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
     </div>
 }

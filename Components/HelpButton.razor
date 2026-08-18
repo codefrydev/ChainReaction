@@ -1,21 +1,22 @@
-﻿<div class="help-inline flex justify-end w-full">
+<div class="help-inline flex justify-end w-full">
     <button type="button"
-            class="help-inline-btn group inline-flex items-center gap-2 px-3 py-1.5 sm:py-2 rounded-full bg-blue-50/90 hover:bg-blue-100/95 text-blue-900 border border-blue-300/60 hover:border-blue-400/80 shadow-sm hover:shadow transition-all duration-200 active:scale-[0.98]"
+            class="help-inline-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/80 hover:bg-slate-700/80 text-amber-400 border border-slate-700/80 hover:border-amber-500/40 shadow-sm hover:shadow transition-all duration-150 active:scale-95 text-xs font-semibold"
             @onclick="() => isOpen = true"
             aria-label="How to Play"
             title="How to Play">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4 text-blue-600 shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4 text-amber-400 shrink-0">
             <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm11.378-3.917c-.89-.777-2.366-.777-3.255 0a.75.75 0 01-.988-1.129c1.454-1.272 3.776-1.272 5.23 0 1.513 1.324 1.513 3.518 0 4.842a3.75 3.75 0 01-.837.552c-.676.328-1.028.774-1.028 1.152v.75a.75.75 0 01-1.5 0v-.75c0-1.279 1.06-2.107 1.875-2.502.182-.088.351-.199.503-.331.83-.727.83-1.857 0-2.584zM12 18a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
         </svg>
-        <span class="text-xs sm:text-sm font-bold text-blue-900" style="font-family: 'Comic Sans MS', cursive;">How to Play</span>
+        <span>Rules & Guide</span>
     </button>
-    <Modal @bind-IsOpen="isOpen" Title="How To Play" CloseOnBackdrop="true">
+
+    <Modal @bind-IsOpen="isOpen" Title="🎮 How To Play Chain Reaction" CloseOnBackdrop="true">
         <ChildContent>
             <Guide />
         </ChildContent>
     </Modal>
 </div>
 
-@code{
+@code {
     private bool isOpen = false;
 }

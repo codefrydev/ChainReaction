@@ -1,171 +1,411 @@
-﻿@page "/Game"
+@page "/Game"
+@using ChainReaction.Model
+@using ChainReaction.Components
 
-<PageTitle>Chain Reaction - Game</PageTitle>
+<PageTitle>Chain Reaction - Live Match</PageTitle>
 
-@if(gridOfCells is not null && gridOfCells.Count > 0)
-{
-    <div class="game-page flex justify-center items-center min-h-screen min-h-[100dvh] p-2 sm:p-4 bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 w-full max-w-full overflow-x-auto overflow-y-auto">
-        <div class="flex flex-col items-center gap-3 w-full max-w-full py-2">
-            <!-- Current Player Indicator -->
-            <div class="px-3 sm:px-4 md:px-6 py-2 md:py-3 rounded-2xl font-black shadow-2xl animate-bounce-cartoon text-xs sm:text-sm md:text-base transition-all duration-500 shrink-0 max-w-full text-center" 
-                 style="background: linear-gradient(135deg, @Config.CurrentUserColor, color-mix(in srgb, @Config.CurrentUserColor 80%, #FFA500)); border: 3px solid color-mix(in srgb, @Config.CurrentUserColor 150%, #000000); color: color-mix(in srgb, @Config.CurrentUserColor 10%, #000000); font-family: 'Comic Sans MS', cursive;">
-                <div class="flex items-center justify-center gap-2 md:gap-3">
-                    <div class="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 rounded-full shadow-lg border-2 shrink-0" style="background: @Config.CurrentUserColor; border-color: color-mix(in srgb, @Config.CurrentUserColor 150%, #000000);"></div>
-                    <span class="text-cartoon drop-shadow-md truncate">▶️ Current Player</span>
+<SlidingBubble />
+
+<div class="relative z-10 h-screen h-[100dvh] w-full max-w-[1600px] mx-auto flex flex-col lg:flex-row items-stretch justify-between p-2 sm:p-3 lg:p-4 gap-2 sm:gap-3 lg:gap-4 overflow-hidden safe-top safe-bottom select-none">
+    
+    <!-- ======================================================== -->
+    <!-- DESKTOP / WIDE SCREEN SIDE HUD PANEL (Visible on lg+ screens) -->
+    <!-- ======================================================== -->
+    <aside class="hidden lg:flex w-72 xl:w-80 flex-col justify-between p-4 glass-card rounded-3xl shrink-0 h-full overflow-hidden border border-slate-700/60 shadow-2xl">
+        <!-- Top: Match Controls & Actions -->
+        <div class="space-y-3">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-700/60">
+                <div>
+                    <h2 class="text-lg font-black text-white tracking-tight" style="font-family: 'Outfit', sans-serif;">
+                        Chain Reaction
+                    </h2>
+                    <p class="text-[11px] font-bold text-amber-400">
+                        Round @(currentRound) · Move #@(totalMoves)
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                    <button type="button"
+                            class="btn-subtle w-8 h-8 rounded-xl text-slate-300 hover:text-white flex items-center justify-center text-xs transition-all active:scale-95 @(Config.Dhwani ? "text-amber-400" : "text-slate-500")"
+                            @onclick="ToggleSound"
+                            title="@(Config.Dhwani ? "Mute Sound" : "Enable Sound")">
+                        @if (Config.Dhwani)
+                        {
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                            </svg>
+                        }
+                        else
+                        {
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                            </svg>
+                        }
+                    </button>
+                    <button type="button"
+                            class="btn-subtle w-8 h-8 rounded-xl text-slate-300 hover:text-white flex items-center justify-center text-xs transition-all active:scale-95"
+                            @onclick="() => helpOpen = true"
+                            title="View Rules">
+                        <span class="font-black text-xs text-amber-400">?</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Game Board Container -->
-            <div class="game-board inline-flex flex-col backdrop-blur-lg rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden transition-all duration-500 shrink-0 max-w-full" 
-                 style="background: linear-gradient(135deg, color-mix(in srgb, @Config.CurrentUserColor 15%, #FFF8DC), color-mix(in srgb, @Config.CurrentUserColor 25%, #FFEAA7)); border: 5px solid @Config.CurrentUserColor; box-shadow: 0 25px 50px -12px color-mix(in srgb, @Config.CurrentUserColor 40%, transparent), 0 0 0 4px color-mix(in srgb, @Config.CurrentUserColor 20%, transparent);">
-                @foreach (var item in gridOfCells)
+            <!-- Current Turn Showcase Card -->
+            @if (CurrentPlayer is not null)
+            {
+                <div class="p-3.5 rounded-2xl shadow-lg border transition-all duration-300 flex items-center gap-3"
+                     style="background: @CurrentPlayer.ColorFormed(); border-color: @CurrentPlayer.DarkerBorderColor; color: @CurrentPlayer.ContrastTextColor;">
+                    <div class="w-10 h-10 rounded-full border-2 border-white/80 shadow-md flex items-center justify-center font-black text-sm shrink-0 bg-black/10">
+                        @(livePlayerList.IndexOf(CurrentPlayer) + 1)
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <span class="text-[10px] uppercase font-black tracking-wider opacity-85 block">Active Turn</span>
+                        <p class="text-base font-extrabold truncate leading-tight">@CurrentPlayer.Name</p>
+                        <span class="text-[11px] font-semibold opacity-90">@CurrentPlayer.CellCount cells · @CurrentPlayer.OrbCount orbs</span>
+                    </div>
+                </div>
+            }
+
+            <!-- Live Player Standings List -->
+            <div class="space-y-1.5 pt-1">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">Player Standings</span>
+                <div class="custom-scrollbar max-h-[38vh] xl:max-h-[44vh] overflow-y-auto space-y-1.5 pr-1">
+                    @for (int i = 0; i < initialPlayerList.Count; i++)
+                    {
+                        var p = initialPlayerList[i];
+                        var isTurn = CurrentPlayer?.Name == p.Name;
+                        var isDead = p.IsEliminated;
+
+                        <div class="p-2 rounded-xl flex items-center justify-between gap-2 border transition-all @(isTurn ? "bg-slate-800/90 border-amber-400/60 shadow-md" : "bg-slate-900/50 border-slate-800") @(isDead ? "opacity-35 grayscale" : "")">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <div class="w-6 h-6 rounded-full border border-white/40 shadow-sm shrink-0 flex items-center justify-center text-[10px] font-black"
+                                     style="background: @p.ColorFormed(); color: @p.ContrastTextColor;">
+                                    @(i + 1)
+                                </div>
+                                <span class="text-xs font-bold text-slate-200 truncate max-w-[110px]">@p.Name</span>
+                            </div>
+
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                @if (!isDead)
+                                {
+                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                                        @p.CellCount c
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-red-950 text-red-400 border border-red-800/50 uppercase">
+                                        OUT
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Action Buttons in Sidebar -->
+        <div class="pt-3 border-t border-slate-700/60 flex items-center gap-2">
+            <button type="button"
+                    class="flex-1 py-2.5 px-3 rounded-xl btn-subtle text-slate-300 hover:text-white flex items-center justify-center gap-1.5 text-xs font-bold transition-all active:scale-95"
+                    @onclick="() => confirmLeaveOpen = true">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <span>Exit Home</span>
+            </button>
+
+            <button type="button"
+                    class="flex-1 py-2.5 px-3 rounded-xl bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/30 text-amber-300 hover:text-amber-200 flex items-center justify-center gap-1.5 text-xs font-bold transition-all active:scale-95"
+                    @onclick="() => confirmRestartOpen = true">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Restart</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ======================================================== -->
+    <!-- MOBILE / PORTRAIT TOP BAR & HUD (Visible on screens < lg) -->
+    <!-- ======================================================== -->
+    <div class="flex lg:hidden flex-col shrink-0 w-full max-w-4xl mx-auto space-y-1">
+        <!-- Top Control Bar -->
+        <header class="w-full px-2 pt-1 pb-1 flex items-center justify-between gap-2">
+            <!-- Left: Home & Restart -->
+            <div class="flex items-center gap-1.5">
+                <button type="button"
+                        class="btn-subtle px-2.5 py-1.5 rounded-xl text-slate-300 hover:text-white flex items-center gap-1 text-xs font-semibold transition-all active:scale-95"
+                        @onclick="() => confirmLeaveOpen = true"
+                        title="Exit to Home">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span class="hidden sm:inline">Home</span>
+                </button>
+
+                <button type="button"
+                        class="btn-subtle px-2.5 py-1.5 rounded-xl text-slate-300 hover:text-white flex items-center gap-1 text-xs font-semibold transition-all active:scale-95"
+                        @onclick="() => confirmRestartOpen = true"
+                        title="Restart match">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span class="hidden sm:inline">Restart</span>
+                </button>
+            </div>
+
+            <!-- Center: Turn Status Pill -->
+            @if (CurrentPlayer is not null)
+            {
+                <div class="px-3 py-1 rounded-full shadow-md flex items-center gap-2 transition-all duration-300 border"
+                     style="background: @CurrentPlayer.ColorFormed(); border-color: @CurrentPlayer.DarkerBorderColor; color: @CurrentPlayer.ContrastTextColor;">
+                    <div class="w-2 h-2 rounded-full bg-white shadow-sm animate-pulse shrink-0"></div>
+                    <span class="text-xs font-bold tracking-wide truncate max-w-[130px] sm:max-w-[180px]">
+                        @CurrentPlayer.Name's Turn
+                    </span>
+                </div>
+            }
+
+            <!-- Right: Round Info, Sound & Rules -->
+            <div class="flex items-center gap-1">
+                <div class="px-2 py-0.5 rounded-full bg-slate-800/80 border border-slate-700/60 text-[10px] font-semibold text-slate-300 flex items-center gap-1 shadow-sm">
+                    <span class="text-amber-400">R@(currentRound)</span>
+                </div>
+
+                <button type="button"
+                        class="btn-subtle w-7 h-7 rounded-xl text-slate-300 hover:text-white flex items-center justify-center text-xs transition-all active:scale-95 @(Config.Dhwani ? "text-amber-400" : "text-slate-500")"
+                        @onclick="ToggleSound"
+                        title="@(Config.Dhwani ? "Mute Sound" : "Enable Sound")">
+                    @if (Config.Dhwani)
+                    {
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        </svg>
+                    }
+                    else
+                    {
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                        </svg>
+                    }
+                </button>
+
+                <button type="button"
+                        class="btn-subtle w-7 h-7 rounded-xl text-slate-300 hover:text-white flex items-center justify-center text-xs transition-all active:scale-95"
+                        @onclick="() => helpOpen = true"
+                        title="View Rules">
+                    <span class="font-black text-xs text-amber-400">?</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Mobile Player Strip -->
+        @if (initialPlayerList.Count > 0)
+        {
+            <div class="w-full px-2 py-0.5 flex items-center justify-center gap-1.5 flex-wrap">
+                @for (int i = 0; i < initialPlayerList.Count; i++)
                 {
-                    <div class="flex flex-row shrink-0">
-                        @foreach (var cell in item)
+                    var p = initialPlayerList[i];
+                    var isTurn = CurrentPlayer?.Name == p.Name;
+                    var isDead = p.IsEliminated;
+
+                    <div class="flex items-center gap-1 px-1.5 py-0.5 rounded-lg text-[10px] font-bold transition-all @(isTurn ? "ring-2 ring-white scale-105 shadow-md" : "opacity-75") @(isDead ? "opacity-30 grayscale" : "")"
+                         style="background: @(isTurn ? p.ColorFormed() : "rgba(30, 41, 59, 0.7)"); color: @(isTurn ? p.ContrastTextColor : "#cbd5e1");">
+                        <div class="w-2.5 h-2.5 rounded-full border border-white/40 shadow-sm shrink-0"
+                             style="background: @p.ColorFormed();"></div>
+                        <span class="truncate max-w-[70px] sm:max-w-[100px]">@p.Name</span>
+                        @if (!isDead)
                         {
-                            <CellComponent cell="cell" OnClick="@(()=>UserClicked(cell))" />
+                            <span class="text-[9px] px-0.5 rounded font-semibold opacity-90 @(isTurn ? "bg-black/20" : "bg-slate-700/60")">
+                                @p.CellCount c
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-[8px] px-0.5 bg-red-900/60 text-red-200 rounded font-black uppercase">OUT</span>
                         }
                     </div>
                 }
             </div>
-        </div>
+        }
     </div>
-}
-else
-{
-    <div class="flex justify-center items-center min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50">
-        <div class="text-center space-y-6">
-            <div class="cheese-loader mx-auto"></div>
-            <p class="text-xl md:text-2xl font-black text-amber-900 animate-bounce-cartoon" style="font-family: 'Comic Sans MS', cursive; text-shadow: 2px 2px 0px rgba(255,255,255,0.5);">
-                🧀 Preparing the Game Board... 🐭
-            </p>
-        </div>
-    </div>
-    <style>
-        .cheese-loader {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            border-radius: 50%;
-            border: 5px solid #8B5A2B;
-            position: relative;
-            animation: rotate-cheese 2s linear infinite;
-            box-shadow: 0 10px 40px rgba(255,215,0,0.5);
-        }
-        .cheese-loader::before,
-        .cheese-loader::after {
-            content: '';
-            position: absolute;
-            background: #F5DEB3;
-            border-radius: 50%;
-            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.3);
-        }
-        .cheese-loader::before {
-            width: 20px;
-            height: 20px;
-            top: 20px;
-            left: 30px;
-        }
-        .cheese-loader::after {
-            width: 25px;
-            height: 25px;
-            bottom: 25px;
-            right: 25px;
-        }
-        @@keyframes rotate-cheese {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-    </style>
-}
 
-@if (dialogShown)
-{
-    <Modal IsOpen="dialogShown" IsOpenChanged="HandleGameOverModalChanged" Title="🏆 Game Over" CloseOnBackdrop="true">
-        <ChildContent>
-            <div class="w-full min-w-0 space-y-3">
-                <p class="text-center text-xs sm:text-sm font-bold text-amber-800/90" style="font-family: 'Comic Sans MS', cursive;">
-                    Final standings — last player standing wins
-                </p>
-
-                <div class="space-y-2">
-                    @{int position = 1;}
-                    @foreach (var player in ScoreLeaderWithTime.OrderByDescending(x => x.Value.Period))
-                    {
-                        var isWinner = position == 1;
-                        <div class="@(isWinner ? "bg-gradient-to-r from-yellow-100 to-amber-100 border-amber-500 ring-2 ring-amber-400/40" : "bg-white/85 border-amber-200/80") flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-xl border-2 shadow-sm min-w-0">
-                            <div class="shrink-0 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full font-black text-sm @(isWinner ? "bg-amber-500 text-amber-950 border-2 border-amber-700" : position == 2 ? "bg-slate-200 text-slate-700 border-2 border-slate-400" : position == 3 ? "bg-orange-200 text-orange-800 border-2 border-orange-400" : "bg-amber-100 text-amber-800 border-2 border-amber-300")" style="font-family: 'Comic Sans MS', cursive;">
-                                @if (isWinner)
-                                {
-                                    <span>👑</span>
-                                }
-                                else if (position == 2)
-                                {
-                                    <span>2</span>
-                                }
-                                else if (position == 3)
-                                {
-                                    <span>3</span>
-                                }
-                                else
-                                {
-                                    <span>@position</span>
-                                }
-                            </div>
-
-                            <div class="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-full border-2 border-amber-900/30 shadow-inner" style="background: @player.Value.color;"></div>
-
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm sm:text-base font-black text-amber-950 truncate" style="font-family: 'Comic Sans MS', cursive;">
-                                    @player.Key
-                                </p>
-                                <p class="text-[11px] sm:text-xs text-amber-700/90 truncate">
-                                    @if (isWinner)
-                                    {
-                                        <span class="font-bold text-amber-800">Winner · </span>
-                                    }
-                                    Survived @FormatDuration(player.Value.Period)
-                                </p>
-                            </div>
-
-                            <div class="shrink-0 text-right">
-                                <p class="text-[10px] uppercase tracking-wide text-amber-600/80 font-bold">Rank</p>
-                                <p class="text-sm sm:text-base font-black text-amber-900" style="font-family: 'Chewy', cursive;">#@position</p>
-                            </div>
-                        </div>
-                        position++;
-                    }
-                </div>
+    <!-- ======================================================== -->
+    <!-- MAIN GAME ARENA (Centered, Responsive, Max Viewport Fit) -->
+    <!-- ======================================================== -->
+    <main class="flex-1 min-h-0 min-w-0 flex items-center justify-center p-1 sm:p-2 lg:p-4 overflow-hidden select-none">
+        @if (gridOfCells is not null && gridOfCells.Count > 0 && CurrentPlayer is not null)
+        {
+            <div class="game-board inline-flex flex-col p-1.5 sm:p-2 rounded-2xl glass-card border border-slate-700/60 shadow-2xl transition-all duration-300 select-none"
+                 style="box-shadow: 0 10px 40px -10px @CurrentPlayer.GlowColorFormed();">
+                @foreach (var rowItem in gridOfCells)
+                {
+                    <div class="flex flex-row shrink-0">
+                        @foreach (var cell in rowItem)
+                        {
+                            <CellComponent cell="cell" 
+                                           CurrentPlayerName="@CurrentPlayer.Name" 
+                                           OnClick="@(() => UserClicked(cell))" />
+                        }
+                    </div>
+                }
             </div>
-        </ChildContent>
+        }
+        else
+        {
+            <div class="flex flex-col items-center justify-center gap-3 text-center">
+                <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center animate-spin">
+                    <span class="text-lg">🎲</span>
+                </div>
+                <p class="text-slate-400 font-semibold text-xs">Fitting Board to Screen…</p>
+            </div>
+        }
+    </main>
 
+</div>
+
+<!-- In-Game Rules Modal -->
+@if (helpOpen)
+{
+    <Modal IsOpen="helpOpen" IsOpenChanged="(v) => helpOpen = v" Title="🎮 Chain Reaction Rules" CloseOnBackdrop="true">
+        <ChildContent>
+            <Guide />
+        </ChildContent>
+    </Modal>
+}
+
+<!-- Confirm Leave Modal -->
+@if (confirmLeaveOpen)
+{
+    <Modal IsOpen="confirmLeaveOpen" IsOpenChanged="(v) => confirmLeaveOpen = v" Title="Leave Current Match?" CloseOnBackdrop="true">
+        <ChildContent>
+            <p class="text-sm text-slate-300">
+                Are you sure you want to abandon the current match and return to the main setup screen? Current game progress will be lost.
+            </p>
+        </ChildContent>
         <Footer>
-            <button class="cartoon-btn w-full sm:w-auto sm:mx-auto sm:flex px-5 py-3 rounded-xl bg-gradient-to-br from-yellow-400 via-amber-400 to-orange-500 text-amber-900 font-black shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.98] border-2 border-amber-800" @onclick="PlayAgain" style="font-family: 'Chewy', cursive;">
-                <span class="flex items-center justify-center gap-2 text-sm sm:text-base">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
-                    </svg>
-                    Play Again
-                </span>
-            </button>
+            <div class="flex items-center justify-end gap-2">
+                <button type="button"
+                        class="px-4 py-2 rounded-xl btn-subtle text-slate-300 font-bold text-xs"
+                        @onclick="() => confirmLeaveOpen = false">
+                    Keep Playing
+                </button>
+                <button type="button"
+                        class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-600/30"
+                        @onclick="GoHome">
+                    Exit Match
+                </button>
+            </div>
         </Footer>
     </Modal>
 }
 
-@code {
-    private string FormatDuration(int seconds)
-    {
-        if (seconds < 60)
-            return $"{seconds}s";
-        
-        int minutes = seconds / 60;
-        int remainingSeconds = seconds % 60;
-        
-        if (minutes < 60)
-            return $"{minutes}m {remainingSeconds}s";
-        
-        int hours = minutes / 60;
-        int remainingMinutes = minutes % 60;
-        return $"{hours}h {remainingMinutes}m";
-    }
+<!-- Confirm Restart Modal -->
+@if (confirmRestartOpen)
+{
+    <Modal IsOpen="confirmRestartOpen" IsOpenChanged="(v) => confirmRestartOpen = v" Title="Restart Match?" CloseOnBackdrop="true">
+        <ChildContent>
+            <p class="text-sm text-slate-300">
+                Restart the match from the beginning with the same players and board settings?
+            </p>
+        </ChildContent>
+        <Footer>
+            <div class="flex items-center justify-end gap-2">
+                <button type="button"
+                        class="px-4 py-2 rounded-xl btn-subtle text-slate-300 font-bold text-xs"
+                        @onclick="() => confirmRestartOpen = false">
+                    Cancel
+                </button>
+                <button type="button"
+                        class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/30"
+                        @onclick="RestartMatch">
+                    Restart Now
+                </button>
+            </div>
+        </Footer>
+    </Modal>
+}
+
+<!-- Victory / Game Over Modal -->
+@if (dialogShown && livePlayerList.Count > 0)
+{
+    var winner = livePlayerList[0];
+    <Modal IsOpen="dialogShown" IsOpenChanged="(v) => dialogShown = v" Title="🏆 Match Over!" CloseOnBackdrop="false">
+        <ChildContent>
+            <div class="space-y-4 text-center">
+                <!-- Winner Showcase -->
+                <div class="p-4 sm:p-5 rounded-3xl border shadow-xl flex flex-col items-center gap-3 animate-scale-in"
+                     style="background: @winner.ColorFormed(); border-color: @winner.DarkerBorderColor; color: @winner.ContrastTextColor;">
+                    <div class="w-16 h-16 rounded-full bg-white/20 border-2 border-white/80 shadow-lg flex items-center justify-center text-3xl animate-bounce">
+                        👑
+                    </div>
+                    <div>
+                        <span class="text-xs uppercase font-black tracking-widest opacity-80">WINNER</span>
+                        <h3 class="text-2xl sm:text-3xl font-black tracking-tight mt-0.5">
+                            @winner.Name
+                        </h3>
+                        <p class="text-xs font-semibold opacity-90 mt-1">
+                            Dominated the arena with @winner.CellCount cells!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Final Standings -->
+                <div class="space-y-2 text-left">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">Final Standings</span>
+                    <div class="space-y-1.5 max-h-[30vh] overflow-y-auto custom-scrollbar pr-1">
+                        <!-- Winner 1st -->
+                        <div class="p-2.5 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-between text-xs font-bold text-white">
+                            <div class="flex items-center gap-2">
+                                <span class="w-5 text-amber-400 font-black">#1</span>
+                                <div class="w-4 h-4 rounded-full border border-white/60" style="background: @winner.ColorFormed();"></div>
+                                <span>@winner.Name</span>
+                            </div>
+                            <span class="text-amber-300">Winner 👑</span>
+                        </div>
+
+                        <!-- Other Players -->
+                        @{
+                            var rank = 2;
+                            var eliminatedOrdered = lostPlayers.OrderByDescending(x => x.Value.Item3).ToList();
+                            foreach (var lp in eliminatedOrdered)
+                            {
+                                if (lp.Key != winner.Name)
+                                {
+                                    <div class="p-2 rounded-xl bg-slate-800/40 border border-slate-700/50 flex items-center justify-between text-xs text-slate-300">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-5 text-slate-500 font-bold">#@rank</span>
+                                            <div class="w-3.5 h-3.5 rounded-full border border-white/40" style="background: @lp.Value.Item2;"></div>
+                                            <span>@lp.Key</span>
+                                        </div>
+                                        <span class="text-slate-500 text-[11px]">Eliminated</span>
+                                    </div>
+                                    rank++;
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </ChildContent>
+        <Footer>
+            <div class="flex flex-col sm:flex-row gap-2 sm:justify-end w-full">
+                <button type="button"
+                        class="px-4 py-2.5 rounded-xl btn-subtle text-slate-300 font-bold text-xs hover:text-white"
+                        @onclick="GoHome">
+                    Exit to Setup
+                </button>
+                <button type="button"
+                        class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/25"
+                        @onclick="RestartMatch">
+                    Play Again 🔄
+                </button>
+            </div>
+        </Footer>
+    </Modal>
 }
