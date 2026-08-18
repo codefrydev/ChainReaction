@@ -114,6 +114,41 @@
         }
     </div>
 
+    <!-- AI Bot & Strategies -->
+    <div class="rounded-2xl overflow-hidden border border-slate-700/60 bg-slate-800/40">
+        <button type="button" @onclick='() => ToggleSection("bot")'
+                class="w-full px-4 py-3 font-bold text-sm sm:text-base text-purple-300 flex items-center justify-between hover:bg-slate-700/30 transition-colors text-left"
+                aria-expanded="@IsOpen("bot")">
+            <span class="flex items-center gap-2.5 min-w-0">
+                <span class="text-base">🤖</span>
+                <span class="truncate">Playing vs AI Bots & Tips</span>
+            </span>
+            <svg class="w-4 h-4 text-purple-300/80 transition-transform @(IsOpen("bot") ? "rotate-180" : "")" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
+        @if (IsOpen("bot"))
+        {
+            <div class="px-4 py-3 bg-slate-900/60 border-t border-slate-700/40 text-slate-300 text-xs sm:text-sm space-y-2.5">
+                <div class="flex items-start gap-2.5">
+                    <span class="text-purple-400 font-bold">🟢</span>
+                    <span><strong>Rookie (Easy):</strong> Great for beginners. Makes casual placements with relaxed threat evaluation.</span>
+                </div>
+                <div class="flex items-start gap-2.5">
+                    <span class="text-amber-400 font-bold">🟡</span>
+                    <span><strong>Tactical (Medium):</strong> Avoids placing orbs near enemy critical cells and aggressively captures corners and edges.</span>
+                </div>
+                <div class="flex items-start gap-2.5">
+                    <span class="text-red-400 font-bold">🔴</span>
+                    <span><strong>Master (Hard):</strong> Full simulation-powered AI. Predicts cascading chain reactions and launches game-ending combinations.</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-purple-950/40 border border-purple-800/40 text-[11px] text-purple-200">
+                    💡 <strong>Pro Tip:</strong> Claim Corners and Edges early on. Placing an orb in a center cell adjacent to an opponent's critical cell is an open invitation for a takeover!
+                </div>
+            </div>
+        }
+    </div>
+
 </div>
 
 @code {

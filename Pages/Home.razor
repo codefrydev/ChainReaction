@@ -53,7 +53,7 @@
                 Chain Reaction
             </h1>
             <p class="text-xs text-amber-400/90 font-bold tracking-wide">
-                Local Pass & Play · Strategic Multiplayer
+                Single Player vs AI · Strategic Multiplayer
             </p>
         </div>
 
@@ -62,7 +62,7 @@
 
     <!-- Main Configuration Card -->
     <div class="w-full max-w-2xl mx-auto my-2 sm:my-3 flex-1 flex flex-col justify-center min-h-0">
-        <div class="glass-card rounded-3xl p-4 sm:p-5 md:p-6 space-y-4 flex flex-col min-h-0">
+        <div class="glass-card rounded-3xl p-4 sm:p-5 md:p-6 space-y-3.5 flex flex-col min-h-0">
             
             <!-- Online Game Promotion Banner -->
             <a href="https://chainreaction.codefrydev.in/"
@@ -83,6 +83,66 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
                 </svg>
             </a>
+
+            <!-- Game Mode Selector (Vs Bot / Pass & Play) -->
+            <div class="space-y-1.5 shrink-0">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs sm:text-sm font-bold text-slate-200 flex items-center gap-1.5">
+                        <span>🎮</span>
+                        <span>Game Mode</span>
+                    </label>
+                    <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                        @(Config.GameMode == "PvBot" ? "Solo vs AI" : "Pass & Play")
+                    </span>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button"
+                            class="p-2.5 rounded-2xl border text-left transition-all flex items-center gap-2.5 @(Config.GameMode == "PvBot" ? "bg-amber-500/20 border-amber-400 text-white shadow-md ring-1 ring-amber-400/40" : "bg-slate-800/50 border-slate-700/60 text-slate-300 hover:bg-slate-800")"
+                            @onclick='() => SetGameMode("PvBot")'>
+                        <div class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-lg shrink-0">
+                            🤖
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-bold text-amber-300 truncate">Play vs Bot (AI)</p>
+                            <p class="text-[10px] text-slate-400 truncate">Challenge computer AI</p>
+                        </div>
+                    </button>
+
+                    <button type="button"
+                            class="p-2.5 rounded-2xl border text-left transition-all flex items-center gap-2.5 @(Config.GameMode == "PvP" ? "bg-amber-500/20 border-amber-400 text-white shadow-md ring-1 ring-amber-400/40" : "bg-slate-800/50 border-slate-700/60 text-slate-300 hover:bg-slate-800")"
+                            @onclick='() => SetGameMode("PvP")'>
+                        <div class="w-8 h-8 rounded-xl bg-slate-700/40 border border-slate-600/40 flex items-center justify-center text-lg shrink-0">
+                            👥
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-bold text-slate-200 truncate">Pass & Play</p>
+                            <p class="text-[10px] text-slate-400 truncate">Same screen friends</p>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Bot Skill Level Quick Bar (Visible in PvBot mode) -->
+                @if (Config.GameMode == "PvBot")
+                {
+                    <div class="pt-1 flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-800">
+                        <span class="text-[11px] font-bold text-slate-300 flex items-center gap-1">
+                            <span>🧠</span>
+                            <span>Bot AI Skill:</span>
+                        </span>
+                        <div class="flex items-center gap-1">
+                            @foreach (var diff in new[] { ("Easy", "🟢 Rookie"), ("Medium", "🟡 Tactical"), ("Hard", "🔴 Master") })
+                            {
+                                var isDiffSelected = Config.DefaultBotDifficulty == diff.Item1;
+                                <button type="button"
+                                        class="px-2 py-1 rounded-lg text-[10px] font-bold transition-all @(isDiffSelected ? "bg-amber-500 text-slate-950 shadow" : "bg-slate-800 text-slate-400 hover:text-slate-200")"
+                                        @onclick="() => SetGlobalDifficulty(diff.Item1)">
+                                    @diff.Item2
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
 
             <!-- Player Count Picker -->
             <div class="space-y-1.5 shrink-0">
@@ -130,7 +190,7 @@
             <!-- Tab 1: Players Customization -->
             @if (activeTab == "players")
             {
-                <div class="custom-scrollbar max-h-[38vh] sm:max-h-[44vh] overflow-y-auto overscroll-contain pr-1 pt-1 pb-1">
+                <div class="custom-scrollbar max-h-[36vh] sm:max-h-[42vh] overflow-y-auto overscroll-contain pr-1 pt-1 pb-1">
                     <div class="grid grid-cols-1 @(Config.NumberOfPlayer > 3 ? "sm:grid-cols-2" : "grid-cols-1") gap-2">
                         @for (int i = 0; i < Config.NumberOfPlayer && i < Config.PlayerList.Count; i++)
                         {
@@ -138,10 +198,17 @@
                             var player = Config.PlayerList[i];
                             <div class="p-2.5 rounded-2xl bg-slate-800/60 border border-slate-700/60 space-y-2">
                                 <div class="flex items-center gap-2">
-                                    <!-- Player Number Badge -->
-                                    <div class="w-7 h-7 rounded-full shadow-md shrink-0 border border-white/40 flex items-center justify-center text-xs font-black"
+                                    <!-- Player Avatar Badge -->
+                                    <div class="w-7 h-7 rounded-full shadow-md shrink-0 border border-white/40 flex items-center justify-center text-xs font-black relative"
                                          style="background: @player.ColorFormed(); color: @player.ContrastTextColor;">
-                                        @(index + 1)
+                                        @if (player.IsBot)
+                                        {
+                                            <span>🤖</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@(index + 1)</span>
+                                        }
                                     </div>
                                     
                                     <!-- Editable Nickname Input -->
@@ -152,6 +219,14 @@
                                                placeholder="Player @(index + 1)"
                                                class="w-full px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-700 text-slate-100 text-xs font-semibold focus:outline-none focus:border-amber-400" />
                                     </div>
+
+                                    <!-- Human / Bot Toggle -->
+                                    <button type="button"
+                                            class="px-2 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1 shrink-0 @(player.IsBot ? "bg-purple-600/30 border border-purple-500/50 text-purple-300 hover:bg-purple-600/40" : "bg-slate-700/50 border border-slate-600/50 text-slate-300 hover:bg-slate-700")"
+                                            @onclick="() => TogglePlayerBot(index)"
+                                            title="Toggle Human or AI Bot">
+                                        <span>@(player.IsBot ? "🤖 Bot" : "👤 Human")</span>
+                                    </button>
 
                                     <!-- Custom Color Picker & Reset -->
                                     <div class="flex items-center gap-1 shrink-0">
@@ -171,6 +246,25 @@
                                         </button>
                                     </div>
                                 </div>
+
+                                <!-- Bot Difficulty Selector if Bot -->
+                                @if (player.IsBot)
+                                {
+                                    <div class="flex items-center justify-between gap-1.5 px-2 py-1 rounded-xl bg-slate-900/60 border border-slate-800 text-[10px]">
+                                        <span class="font-bold text-slate-400">Bot Difficulty:</span>
+                                        <div class="flex items-center gap-1">
+                                            @foreach (var diff in new[] { "Easy", "Medium", "Hard" })
+                                            {
+                                                var isDiff = player.BotDifficulty == diff;
+                                                <button type="button"
+                                                        class="px-1.5 py-0.5 rounded font-bold transition-all @(isDiff ? "bg-amber-500 text-slate-950" : "bg-slate-800 text-slate-400 hover:text-white")"
+                                                        @onclick="() => SetPlayerBotDifficulty(index, diff)">
+                                                    @diff
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                }
 
                                 <!-- Color Quick Palette Swatches -->
                                 <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
@@ -298,7 +392,7 @@
             <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
                 <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/>
             </svg>
-            <span>START MATCH · @Config.NumberOfPlayer PLAYERS</span>
+            <span>@GetStartButtonText()</span>
         </button>
     </div>
 

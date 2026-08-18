@@ -10,6 +10,8 @@ namespace ChainReaction.Model
         public int CellCount { get; set; } = 0;
         public int OrbCount { get; set; } = 0;
         public bool IsEliminated { get; set; } = false;
+        public bool IsBot { get; set; } = false;
+        public string BotDifficulty { get; set; } = "Medium"; // Easy, Medium, Hard
 
         public string ColorFormed()
             => $"rgb({RColor},{GColor},{BColor})";
@@ -75,7 +77,9 @@ namespace ChainReaction.Model
                 BColor = this.BColor,
                 CellCount = this.CellCount,
                 OrbCount = this.OrbCount,
-                IsEliminated = this.IsEliminated
+                IsEliminated = this.IsEliminated,
+                IsBot = this.IsBot,
+                BotDifficulty = this.BotDifficulty
             };
         }
     }

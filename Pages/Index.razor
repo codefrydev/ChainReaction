@@ -58,10 +58,27 @@
                 <div class="p-3.5 rounded-2xl shadow-lg border transition-all duration-300 flex items-center gap-3"
                      style="background: @CurrentPlayer.ColorFormed(); border-color: @CurrentPlayer.DarkerBorderColor; color: @CurrentPlayer.ContrastTextColor;">
                     <div class="w-10 h-10 rounded-full border-2 border-white/80 shadow-md flex items-center justify-center font-black text-sm shrink-0 bg-black/10">
-                        @(livePlayerList.IndexOf(CurrentPlayer) + 1)
+                        @if (CurrentPlayer.IsBot)
+                        {
+                            <span class="text-base @(isBotThinking ? "animate-bounce" : "")">🤖</span>
+                        }
+                        else
+                        {
+                            <span>@(livePlayerList.IndexOf(CurrentPlayer) + 1)</span>
+                        }
                     </div>
                     <div class="min-w-0 flex-1">
-                        <span class="text-[10px] uppercase font-black tracking-wider opacity-85 block">Active Turn</span>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] uppercase font-black tracking-wider opacity-85 block">
+                                @(CurrentPlayer.IsBot ? (isBotThinking ? "Bot Thinking..." : "Bot Turn") : "Active Turn")
+                            </span>
+                            @if (CurrentPlayer.IsBot)
+                            {
+                                <span class="text-[9px] font-black px-1.5 py-0.2 rounded bg-black/30 border border-white/20 uppercase">
+                                    @CurrentPlayer.BotDifficulty
+                                </span>
+                            }
+                        </div>
                         <p class="text-base font-extrabold truncate leading-tight">@CurrentPlayer.Name</p>
                         <span class="text-[11px] font-semibold opacity-90">@CurrentPlayer.CellCount cells · @CurrentPlayer.OrbCount orbs</span>
                     </div>
@@ -82,9 +99,22 @@
                             <div class="flex items-center gap-2 min-w-0">
                                 <div class="w-6 h-6 rounded-full border border-white/40 shadow-sm shrink-0 flex items-center justify-center text-[10px] font-black"
                                      style="background: @p.ColorFormed(); color: @p.ContrastTextColor;">
-                                    @(i + 1)
+                                    @if (p.IsBot)
+                                    {
+                                        <span class="text-[11px]">🤖</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@(i + 1)</span>
+                                    }
                                 </div>
-                                <span class="text-xs font-bold text-slate-200 truncate max-w-[110px]">@p.Name</span>
+                                <div class="min-w-0">
+                                    <span class="text-xs font-bold text-slate-200 truncate block max-w-[100px]">@p.Name</span>
+                                    @if (p.IsBot)
+                                    {
+                                        <span class="text-[9px] text-slate-400 font-semibold block leading-none">@p.BotDifficulty AI</span>
+                                    }
+                                </div>
                             </div>
 
                             <div class="flex items-center gap-1.5 shrink-0">
@@ -163,9 +193,16 @@
             {
                 <div class="px-3 py-1 rounded-full shadow-md flex items-center gap-2 transition-all duration-300 border"
                      style="background: @CurrentPlayer.ColorFormed(); border-color: @CurrentPlayer.DarkerBorderColor; color: @CurrentPlayer.ContrastTextColor;">
-                    <div class="w-2 h-2 rounded-full bg-white shadow-sm animate-pulse shrink-0"></div>
+                    @if (CurrentPlayer.IsBot)
+                    {
+                        <span class="text-xs @(isBotThinking ? "animate-spin" : "")">🤖</span>
+                    }
+                    else
+                    {
+                        <div class="w-2 h-2 rounded-full bg-white shadow-sm animate-pulse shrink-0"></div>
+                    }
                     <span class="text-xs font-bold tracking-wide truncate max-w-[130px] sm:max-w-[180px]">
-                        @CurrentPlayer.Name's Turn
+                        @(CurrentPlayer.IsBot && isBotThinking ? $"{CurrentPlayer.Name} thinking…" : $"{CurrentPlayer.Name}'s Turn")
                     </span>
                 </div>
             }
@@ -216,8 +253,13 @@
 
                     <div class="flex items-center gap-1 px-1.5 py-0.5 rounded-lg text-[10px] font-bold transition-all @(isTurn ? "ring-2 ring-white scale-105 shadow-md" : "opacity-75") @(isDead ? "opacity-30 grayscale" : "")"
                          style="background: @(isTurn ? p.ColorFormed() : "rgba(30, 41, 59, 0.7)"); color: @(isTurn ? p.ContrastTextColor : "#cbd5e1");">
-                        <div class="w-2.5 h-2.5 rounded-full border border-white/40 shadow-sm shrink-0"
-                             style="background: @p.ColorFormed();"></div>
+                        <div class="w-2.5 h-2.5 rounded-full border border-white/40 shadow-sm shrink-0 flex items-center justify-center"
+                             style="background: @p.ColorFormed();">
+                            @if (p.IsBot)
+                            {
+                                <span class="text-[7px]">🤖</span>
+                            }
+                        </div>
                         <span class="truncate max-w-[70px] sm:max-w-[100px]">@p.Name</span>
                         @if (!isDead)
                         {
@@ -241,7 +283,7 @@
     <main class="flex-1 min-h-0 min-w-0 flex items-center justify-center p-1 sm:p-2 lg:p-4 overflow-hidden select-none">
         @if (gridOfCells is not null && gridOfCells.Count > 0 && CurrentPlayer is not null)
         {
-            <div class="game-board inline-flex flex-col p-1.5 sm:p-2 rounded-2xl glass-card border border-slate-700/60 shadow-2xl transition-all duration-300 select-none"
+            <div class="game-board inline-flex flex-col p-1.5 sm:p-2 rounded-2xl glass-card border border-slate-700/60 shadow-2xl transition-all duration-300 select-none @(CurrentPlayer.IsBot ? "pointer-events-none" : "")"
                  style="box-shadow: 0 10px 40px -10px @CurrentPlayer.GlowColorFormed();">
                 @foreach (var rowItem in gridOfCells)
                 {
@@ -249,7 +291,7 @@
                         @foreach (var cell in rowItem)
                         {
                             <CellComponent cell="cell" 
-                                           CurrentPlayerName="@CurrentPlayer.Name" 
+                                           CurrentPlayerName="@(CurrentPlayer.IsBot ? string.Empty : CurrentPlayer.Name)" 
                                            OnClick="@(() => UserClicked(cell))" />
                         }
                     </div>
@@ -342,15 +384,24 @@
                 <div class="p-4 sm:p-5 rounded-3xl border shadow-xl flex flex-col items-center gap-3 animate-scale-in"
                      style="background: @winner.ColorFormed(); border-color: @winner.DarkerBorderColor; color: @winner.ContrastTextColor;">
                     <div class="w-16 h-16 rounded-full bg-white/20 border-2 border-white/80 shadow-lg flex items-center justify-center text-3xl animate-bounce">
-                        👑
+                        @(winner.IsBot ? "🤖" : "👑")
                     </div>
                     <div>
-                        <span class="text-xs uppercase font-black tracking-widest opacity-80">WINNER</span>
+                        <span class="text-xs uppercase font-black tracking-widest opacity-80">
+                            @(winner.IsBot ? "AI BOT VICTORY" : "MATCH WINNER")
+                        </span>
                         <h3 class="text-2xl sm:text-3xl font-black tracking-tight mt-0.5">
                             @winner.Name
                         </h3>
                         <p class="text-xs font-semibold opacity-90 mt-1">
-                            Dominated the arena with @winner.CellCount cells!
+                            @if (winner.IsBot)
+                            {
+                                <span>The @winner.BotDifficulty AI conquered the arena with @winner.CellCount cells!</span>
+                            }
+                            else
+                            {
+                                <span>Dominated the arena with @winner.CellCount cells!</span>
+                            }
                         </p>
                     </div>
                 </div>
@@ -363,10 +414,16 @@
                         <div class="p-2.5 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-between text-xs font-bold text-white">
                             <div class="flex items-center gap-2">
                                 <span class="w-5 text-amber-400 font-black">#1</span>
-                                <div class="w-4 h-4 rounded-full border border-white/60" style="background: @winner.ColorFormed();"></div>
+                                <div class="w-4 h-4 rounded-full border border-white/60 flex items-center justify-center text-[9px]" style="background: @winner.ColorFormed();">
+                                    @if (winner.IsBot) { <span>🤖</span> }
+                                </div>
                                 <span>@winner.Name</span>
+                                @if (winner.IsBot)
+                                {
+                                    <span class="text-[9px] font-bold px-1 rounded bg-slate-800 text-slate-400">@winner.BotDifficulty</span>
+                                }
                             </div>
-                            <span class="text-amber-300">Winner 👑</span>
+                            <span class="text-amber-300">Winner @(winner.IsBot ? "🤖" : "👑")</span>
                         </div>
 
                         <!-- Other Players -->
@@ -377,10 +434,13 @@
                             {
                                 if (lp.Key != winner.Name)
                                 {
+                                    var origPlayer = initialPlayerList.FirstOrDefault(p => p.Name == lp.Key);
                                     <div class="p-2 rounded-xl bg-slate-800/40 border border-slate-700/50 flex items-center justify-between text-xs text-slate-300">
                                         <div class="flex items-center gap-2">
                                             <span class="w-5 text-slate-500 font-bold">#@rank</span>
-                                            <div class="w-3.5 h-3.5 rounded-full border border-white/40" style="background: @lp.Value.Item2;"></div>
+                                            <div class="w-3.5 h-3.5 rounded-full border border-white/40 flex items-center justify-center text-[7px]" style="background: @lp.Value.Item2;">
+                                                @if (origPlayer?.IsBot == true) { <span>🤖</span> }
+                                            </div>
                                             <span>@lp.Key</span>
                                         </div>
                                         <span class="text-slate-500 text-[11px]">Eliminated</span>

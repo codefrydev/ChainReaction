@@ -11,6 +11,9 @@ public partial class Index : IAsyncDisposable
     [Inject] public NavigationManager NavigationManager { get; set; } = null!;
 
     private bool busy = false;
+    private bool isBotThinking = false;
+    private CancellationTokenSource? botCts;
+
     private int currentPlayerIndex = 0;
     private int column = 6;
     private int row = 9;
@@ -41,61 +44,148 @@ public partial class Index : IAsyncDisposable
 
     public async Task UserClicked(Cell cell)
     {
-        if (busy || CurrentPlayer is null) return;
+        // Humans cannot click when busy, when bot is thinking, or when it is a bot's turn
+        if (busy || isBotThinking || CurrentPlayer is null || CurrentPlayer.IsBot) return;
 
         // Validation: player can only click on empty cells or cells they own
         if (cell.IsAvailableFor(CurrentPlayer.Name))
         {
-            busy = true;
-            totalMoves++;
+            await ExecuteMove(cell);
+        }
+    }
 
-            // Play orb placement pop sound
-            if (Config.Dhwani)
+    private async Task ExecuteMove(Cell cell)
+    {
+        if (CurrentPlayer is null || !cell.IsAvailableFor(CurrentPlayer.Name)) return;
+
+        busy = true;
+        isBotThinking = false;
+        totalMoves++;
+
+        // Play orb placement pop sound
+        if (Config.Dhwani)
+        {
+            try
             {
-                try
-                {
-                    double pitch = 0.9 + (currentPlayerIndex * 0.1);
-                    _ = JSRuntime.InvokeVoidAsync("blazorFunctions.PlayPop", pitch);
-                }
-                catch {}
+                double pitch = 0.9 + (currentPlayerIndex * 0.1);
+                _ = JSRuntime.InvokeVoidAsync("blazorFunctions.PlayPop", pitch);
+            }
+            catch {}
+        }
+
+        AllPlayerValidation();
+
+        // Execute placement and chain reactions
+        int chainReactionCount = 0;
+        await PlaceOrbAndResolve(cell, chainReactionCount);
+
+        // Update stats
+        UpdatePlayerStats();
+
+        if (allPlayerPlayed)
+        {
+            CalculateScore();
+            if (livePlayerList.Count == 1)
+            {
+                await Task.Delay(400);
+                ShowLeaderBoard();
+                busy = false;
+                StateHasChanged();
+                return;
+            }
+        }
+
+        // Next player turn
+        if (livePlayerList.Count > 0)
+        {
+            currentPlayerIndex = (currentPlayerIndex + 1) % livePlayerList.Count;
+            if (currentPlayerIndex == 0)
+            {
+                currentRound++;
             }
 
-            AllPlayerValidation();
+            var nextPlayer = livePlayerList[currentPlayerIndex];
+            Config.CurrentUserColor = nextPlayer.ColorFormed();
+            Config.HoverColor = nextPlayer.HoverColorFormed();
+        }
 
-            // Execute placement and chain reactions
-            int chainReactionCount = 0;
-            await PlaceOrbAndResolve(cell, chainReactionCount);
+        busy = false;
+        StateHasChanged();
 
-            // Update stats
-            UpdatePlayerStats();
+        // If next player is a Bot, trigger AI turn
+        if (CurrentPlayer is not null && CurrentPlayer.IsBot && !dialogShown && livePlayerList.Count > 1)
+        {
+            _ = CheckAndTriggerBotTurn();
+        }
+    }
 
-            if (allPlayerPlayed)
+    private async Task CheckAndTriggerBotTurn()
+    {
+        if (CurrentPlayer is null || !CurrentPlayer.IsBot || dialogShown || livePlayerList.Count <= 1)
+            return;
+
+        busy = true;
+        isBotThinking = true;
+        StateHasChanged();
+
+        botCts?.Cancel();
+        botCts?.Dispose();
+        botCts = new CancellationTokenSource();
+        var token = botCts.Token;
+
+        try
+        {
+            int thinkingDelay = Config.GameSpeed switch
             {
-                CalculateScore();
-                if (livePlayerList.Count == 1)
-                {
-                    await Task.Delay(400);
-                    ShowLeaderBoard();
-                    busy = false;
-                    StateHasChanged();
-                    return;
-                }
+                "Fast" => 240,
+                "Dramatic" => 750,
+                _ => 450
+            };
+
+            await Task.Delay(thinkingDelay, token);
+
+            if (token.IsCancellationRequested || dialogShown || CurrentPlayer is null || !CurrentPlayer.IsBot)
+            {
+                isBotThinking = false;
+                busy = false;
+                StateHasChanged();
+                return;
             }
 
-            // Next player turn
-            if (livePlayerList.Count > 0)
+            var bestCell = BotEngine.FindBestMove(gridOfCells, row, column, CurrentPlayer, initialPlayerList, CurrentPlayer.BotDifficulty);
+            if (bestCell is not null)
             {
-                currentPlayerIndex = (currentPlayerIndex + 1) % livePlayerList.Count;
-                if (currentPlayerIndex == 0)
-                {
-                    currentRound++;
-                }
-
-                var nextPlayer = livePlayerList[currentPlayerIndex];
-                Config.CurrentUserColor = nextPlayer.ColorFormed();
-                Config.HoverColor = nextPlayer.HoverColorFormed();
+                await ExecuteMove(bestCell);
             }
-
+            else
+            {
+                // Fallback: select first valid available cell
+                for (int r = 0; r < row; r++)
+                {
+                    for (int c = 0; c < column; c++)
+                    {
+                        var cell = gridOfCells[r][c];
+                        if (cell.IsAvailableFor(CurrentPlayer.Name))
+                        {
+                            await ExecuteMove(cell);
+                            return;
+                        }
+                    }
+                }
+                busy = false;
+                isBotThinking = false;
+                StateHasChanged();
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            isBotThinking = false;
+            busy = false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Bot turn error: {ex.Message}");
+            isBotThinking = false;
             busy = false;
             StateHasChanged();
         }
@@ -321,6 +411,7 @@ public partial class Index : IAsyncDisposable
 
     private void GoHome()
     {
+        botCts?.Cancel();
         confirmLeaveOpen = false;
         dialogShown = false;
         NavigationManager.NavigateTo("");
@@ -328,15 +419,23 @@ public partial class Index : IAsyncDisposable
 
     private void RestartMatch()
     {
+        botCts?.Cancel();
         confirmRestartOpen = false;
         dialogShown = false;
         ResetForNewGame();
         StateHasChanged();
+
+        if (CurrentPlayer is not null && CurrentPlayer.IsBot)
+        {
+            _ = CheckAndTriggerBotTurn();
+        }
     }
 
     private void ResetForNewGame()
     {
+        botCts?.Cancel();
         busy = false;
+        isBotThinking = false;
         currentPlayerIndex = 0;
         totalMoves = 0;
         currentRound = 1;
@@ -364,6 +463,12 @@ public partial class Index : IAsyncDisposable
             dotNetRef = DotNetObjectReference.Create(this);
             await JSRuntime.InvokeVoidAsync("chainReactionLayout.register", dotNetRef);
             await GetInnerDimensions();
+
+            // If match starts with a bot turn, kick off bot AI
+            if (CurrentPlayer is not null && CurrentPlayer.IsBot)
+            {
+                _ = CheckAndTriggerBotTurn();
+            }
         }
     }
 
@@ -377,6 +482,8 @@ public partial class Index : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        botCts?.Cancel();
+        botCts?.Dispose();
         dotNetRef?.Dispose();
         try
         {

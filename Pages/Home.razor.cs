@@ -42,6 +42,87 @@ namespace ChainReaction.Pages
             catch {}
         }
 
+        private void SetGameMode(string mode)
+        {
+            Config.ApplyGameMode(mode);
+            StateHasChanged();
+        }
+
+        private void SetGlobalDifficulty(string difficulty)
+        {
+            Config.DefaultBotDifficulty = difficulty;
+            for (int i = 0; i < Config.PlayerList.Count; i++)
+            {
+                if (Config.PlayerList[i].IsBot)
+                {
+                    Config.PlayerList[i].BotDifficulty = difficulty;
+                }
+            }
+            StateHasChanged();
+        }
+
+        private void TogglePlayerBot(int playerIndex)
+        {
+            if (playerIndex >= 0 && playerIndex < Config.PlayerList.Count)
+            {
+                var player = Config.PlayerList[playerIndex];
+                player.IsBot = !player.IsBot;
+                if (player.IsBot)
+                {
+                    player.BotDifficulty = Config.DefaultBotDifficulty;
+                    if (string.IsNullOrEmpty(player.Name) || player.Name == $"Player {playerIndex + 1}" || player.Name == "You (P1)")
+                    {
+                        var botName = playerIndex - 1 >= 0 && playerIndex - 1 < Config.PresetBotNames.Count
+                            ? Config.PresetBotNames[playerIndex - 1]
+                            : $"Bot {playerIndex + 1}";
+                        player.Name = botName;
+                    }
+                }
+                else
+                {
+                    if (Config.PresetBotNames.Contains(player.Name) || player.Name.StartsWith("Bot "))
+                    {
+                        player.Name = playerIndex == 0 ? "You (P1)" : $"Player {playerIndex + 1}";
+                    }
+                }
+                StateHasChanged();
+            }
+        }
+
+        private void SetPlayerBotDifficulty(int playerIndex, string difficulty)
+        {
+            if (playerIndex >= 0 && playerIndex < Config.PlayerList.Count)
+            {
+                Config.PlayerList[playerIndex].BotDifficulty = difficulty;
+                StateHasChanged();
+            }
+        }
+
+        private string GetStartButtonText()
+        {
+            var activePlayers = Config.PlayerList.Take(Config.NumberOfPlayer).ToList();
+            int botCount = activePlayers.Count(p => p.IsBot);
+            int humanCount = activePlayers.Count - botCount;
+
+            if (humanCount == 1 && botCount == 1)
+            {
+                var bot = activePlayers.First(p => p.IsBot);
+                return $"START MATCH · YOU vs {bot.Name.ToUpper()} ({bot.BotDifficulty.ToUpper()})";
+            }
+            else if (humanCount > 0 && botCount > 0)
+            {
+                return $"START MATCH · {humanCount} HUMAN{(humanCount > 1 ? "S" : "")} vs {botCount} BOT{(botCount > 1 ? "S" : "")}";
+            }
+            else if (botCount == activePlayers.Count)
+            {
+                return $"START BOT ARENA · {botCount} BOTS";
+            }
+            else
+            {
+                return $"START MATCH · {activePlayers.Count} PLAYERS";
+            }
+        }
+
         private void SetPlayerCount(int count)
         {
             Config.NumberOfPlayer = Math.Clamp(count, 2, 8);
@@ -51,12 +132,19 @@ namespace ChainReaction.Pages
             {
                 int nextIdx = Config.PlayerList.Count;
                 var preset = Config.PresetColors[nextIdx % Config.PresetColors.Count];
+                bool isBot = Config.GameMode == "PvBot";
+                var defaultName = isBot 
+                    ? (nextIdx - 1 < Config.PresetBotNames.Count ? Config.PresetBotNames[nextIdx - 1] : $"Bot {nextIdx + 1}")
+                    : $"Player {nextIdx + 1}";
+
                 Config.PlayerList.Add(new Player
                 {
-                    Name = $"Player {nextIdx + 1}",
+                    Name = defaultName,
                     RColor = preset.R,
                     GColor = preset.G,
-                    BColor = preset.B
+                    BColor = preset.B,
+                    IsBot = isBot,
+                    BotDifficulty = Config.DefaultBotDifficulty
                 });
             }
             StateHasChanged();
@@ -119,7 +207,27 @@ namespace ChainReaction.Pages
             {
                 var preset = Config.PresetColors[playerIndex % Config.PresetColors.Count];
                 var player = Config.PlayerList[playerIndex];
-                player.Name = $"Player {playerIndex + 1}";
+                
+                if (Config.GameMode == "PvBot")
+                {
+                    if (playerIndex == 0)
+                    {
+                        player.Name = "You (P1)";
+                        player.IsBot = false;
+                    }
+                    else
+                    {
+                        player.Name = playerIndex - 1 < Config.PresetBotNames.Count ? Config.PresetBotNames[playerIndex - 1] : $"Bot {playerIndex + 1}";
+                        player.IsBot = true;
+                        player.BotDifficulty = Config.DefaultBotDifficulty;
+                    }
+                }
+                else
+                {
+                    player.Name = $"Player {playerIndex + 1}";
+                    player.IsBot = false;
+                }
+
                 player.RColor = preset.R;
                 player.GColor = preset.G;
                 player.BColor = preset.B;
